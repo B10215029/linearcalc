@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QVector>
+#include <Vec.h>
+#include <Mat.h>
 
 namespace Ui {
 class MainWindow;
@@ -46,6 +49,8 @@ private slots:
 
 private:
 	Ui::MainWindow *ui;
+	QVector<Vec> v;
+	QVector<Mat> m;
 };
 
 #endif // MAINWINDOW_H

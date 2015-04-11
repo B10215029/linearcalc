@@ -1,8 +1,7 @@
 ﻿#ifndef MAT_H
 #define MAT_H
+
 #include "Vec.h"
-#include <iostream>
-using namespace std;
 
 class Mat{
 protected:
@@ -16,21 +15,21 @@ public:
 	Mat(Vec* v,int r,int c);
 	~Mat();
 ////////// ////////// ////////// //////////
-	inline Mat operator+(const Mat& m);
-	inline Mat operator-(const Mat& m);
-	inline Mat operator*(const Mat& m);
-	inline Mat operator=(const Mat& m);
-	friend ostream& operator<<(ostream&,const Mat&);
+	Mat operator+(const Mat& m);
+	Mat operator-(const Mat& m);
+	Mat operator*(const Mat& m);
+	Mat operator=(const Mat& m);
+	//cout<< 可能用不到
+	//friend ostream& operator<<(ostream&,const Mat&);
 ////////// ////////// ////////// //////////
-	inline void setO();
-	inline void setI();
-	inline void setData(double** d,int r,int c);
-	inline void setData(Vec* v,int r,int c);
-	inline void setData(double d,int r,int c);
-	inline Vec getRowData(int r);
-	inline Vec getColData(int c);
-	inline int getRow();
-	inline int getCol();
+	void setO();
+	void setI();
+	void setData(double** d,int r,int c);
+	void setData(Vec* v,int r,int c);
+	void setData(double d,int r,int c);
+	Vec getRowData(int r);
+	Vec getColData(int c);
+	int getRow();
+	int getCol();
 };
-
 #endif

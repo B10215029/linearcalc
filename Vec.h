@@ -1,8 +1,7 @@
 ﻿#ifndef VEC_H
 #define VEC_H
-#include <iostream>
+
 #include <sstream>
-using namespace std;
 
 class Vec{
 protected:
@@ -14,18 +13,22 @@ public:
 	Vec(double* d,int s);
 	Vec(const Vec &v);
 	~Vec();
+////////// ////////// ////////// //////////
 	Vec operator+(const Vec& v);
 	Vec operator-(const Vec& v);
+	//第1參數非Vec,不能是memberFunc,有其它memberFunc用到,so要宣告,不加friend會當作memberFunc
 	friend Vec operator*(const double,const Vec&);
 	Vec operator*(const double c);
 	Vec operator/(const double c);
 	bool operator==(Vec& v);
 	bool operator!=(Vec& v);
 	Vec operator=(const Vec& v);
-	friend ostream& operator<<(ostream&,const Vec&);
+	//cout<< 可能用不到
+	//friend ostream& operator<<(ostream&,const Vec&);
+////////// ////////// ////////// //////////
 	void setO();
 	void setI();
-	void setData(double* d,int l);
+	void setData(double* d,int s);
 	void setData(double d,int i);
 	double getData(int i);
 	int getDim();
@@ -42,23 +45,7 @@ public:
 	double comp(Vec& v);
 	Vec proj(Vec& v);
 	Vec cross3(const Vec& v);
-	//////////
-	string toString(){
-		ostringstream out;
-		for(int i=0;i<dim;++i){
-			if(i==0)
-				out<<"(";
-			if(i!=dim-1)
-				out<<data[i]<<", ";
-			else
-				out<<data[i]<<")";
-		}
-		return out.str();
-	}
-
+	std::string toString();
+////////// ////////// ////////// //////////
 };
-
-
-
-
 #endif

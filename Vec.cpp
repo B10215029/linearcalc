@@ -1,9 +1,5 @@
 ﻿#include<Vec.h>
 #include<cmath>
-#ifndef M_PI
-#define M_PI 3.1415926535897932384626
-#endif
-
 
 Vec::Vec(){
 	data=new double[3];
@@ -39,10 +35,15 @@ Vec Vec::operator-(const Vec& v){//----Subtraction
 	for(int i=0;i<dim;i++) re.data[i]=data[i]-v.data[i];
 	return re;
 }
-//friend Vec operator*(const double,const Vec&);//第1參數非Vec,不能是memberFunc,有其它memberFunc用到,so要宣告,不加friend會當作memberFunc
+
 Vec Vec::operator*(const double c){//----Scalar multiplication
 	Vec v(dim);
 	for(int i=0;i<dim;i++) v.data[i]=c*data[i];
+	return v;
+}
+Vec operator*(const double c,const Vec& v1){//----Scalar multiplication
+	Vec v(v1.dim);
+	for(int i=0;i<v1.dim;i++) v.data[i]=c*v1.data[i];
 	return v;
 }
 Vec Vec::operator/(const double c){//----Scalar division
@@ -64,6 +65,14 @@ Vec Vec::operator=(const Vec& v){//----Asign
 	for(int i=0;i<dim;i++) data[i]=v.data[i];
 	return *this;
 }
+/*ostream& operator<<(ostream& out,const Vec& v){//----output <<
+	for(int i=0;i<v.dim;++i){
+		if(i==0) out<<"(";
+		if(i!=v.dim-1) out<<v.data[i]<<",";
+		else out<<v.data[i]<<")";
+	}
+	return out;
+}*/
 //friend ostream& operator<<(ostream&,const Vec&);//加friend才能存取protected
 ////////// ////////// ////////// //////////
 void Vec::setO(){//----0
@@ -72,9 +81,9 @@ void Vec::setO(){//----0
 void Vec::setI(){//----1
 	for(int i=0;i<dim;i++) data[i]=1.;
 }
-void Vec::setData(double* d,int l){
+void Vec::setData(double* d,int s){
 	if(data) delete[] data;
-	dim=l;
+	dim=s;
 	data=new double[dim];
 	for(int i=0;i<dim;i++) data[i]=d[i];
 }
@@ -154,17 +163,18 @@ Vec Vec::cross3(const Vec& v){
 	re.data[2]=data[0]*v.data[1]-data[1]*v.data[0];
 	return re;
 }
-
-Vec operator*(const double c,const Vec& v1){//----Scalar multiplication
-	Vec v(v1.dim);
-	for(int i=0;i<v1.dim;i++) v.data[i]=c*v1.data[i];
-	return v;
-}
-ostream& operator<<(ostream& out,const Vec& v){//----output <<
-	for(int i=0;i<v.dim;++i){
-		if(i==0) out<<"(";
-		if(i!=v.dim-1) out<<v.data[i]<<",";
-		else out<<v.data[i]<<")";
+std::string Vec::toString(){
+	std::string out="";
+	for(int i=0;i<dim;++i){
+		if(i==0) out+="(";
+		if(i!=dim-1){
+			out+=data[i];
+			out+=", ";
+		}
+		else{
+			out+=data[i];
+			out+=")";
+		}
 	}
 	return out;
 }

@@ -87,29 +87,55 @@ QString toPostfix(QString &inputStr){
 
 void MainWindow::on_actionOpen_triggered()
 {
-    //Open Dialog and Return file Directory
-    QString fname=QFileDialog::getOpenFileName(this,"Open File" , "../" , "Text(*.txt);;All(*)");
+	//Open Dialog and Return file Directory
+	QString fname=QFileDialog::getOpenFileName(this,"Open File" , "../" , "Text(*.txt);;All(*)");
 
-    QFile f(fname);
+	QFile f(fname);
 
-    //Open File and test whether it is error
-    if(!f.open(QIODevice::ReadOnly)) std::cerr<<"Error";
+	//Open File and test whether it is error
+	if(!f.open(QIODevice::ReadOnly)) ui->textBrowser->append(fname+"[Open File Error]");
 
-    //Read Line
-    QTextStream in(&f);
-    in.setCodec("UTF-8");
-    QString line;
-    int num;
-    in>>num;
-    for(int i=0;i<num;i++){
-       in>>line;
-       //if(line=="V")
-       //else if(line=="M")
-    }
+	//to stream like c++ cin
+	QTextStream in(&f);
+	in.setCodec("UTF-8");
 
-    if(fname!=NULL){
-        ui->textBrowser->setText(fname+"\n"+line);
-    }
+	//first line is always int
+	int num;
+	in>>num;
+
+	//Read line and Set v, m
+	QString line;
+	for(int i=num;i>0;i--){
+		in>>line;
+
+		if(line=="V"){
+			in>>num;
+			Vec vv(num);
+			for(int j=0;j<num;j++){
+				double d;
+				in>>d;
+				vv.setData(d,j);
+			}
+			this->v.push_back(vv);
+		}
+		else if(line=="M"){
+			int col;
+			in>>num;
+			in>>col;
+			Mat mm(num,col);
+			for(int r=0;r<num;r++){
+				for(int c=0;c<col;c++){
+					double d;
+					in>>d;
+					mm.setData(d,r,c);
+				}
+			}
+			this->m.push_back(mm);
+		}
+	}
+	if(fname!=NULL){
+		ui->textBrowser->append(fname+"\n"+QString::fromStdString(this->v[0].toString()));
+	}
 }
 
 void MainWindow::on_lineEdit_returnPressed()
