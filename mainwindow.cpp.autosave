@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
 {
-	ui->setupUi(this);
+    ui->setupUi(this);
 	ui->comboBox->addItem("選擇向量");
 	ui->comboBox_2->addItem("選擇矩陣");
 	ui->comboBox_3->addItem("選擇常數");
