@@ -12,6 +12,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->setupUi(this);
 	ui->comboBox->addItem("選擇向量");
 	ui->comboBox_2->addItem("選擇矩陣");
+	ui->comboBox_3->addItem("選擇常數");
+	ui->comboBox_3->addItem("0");
+	ui->comboBox_3->addItem("1");
+	ui->comboBox_3->addItem("2");
 }
 
 MainWindow::~MainWindow()
@@ -21,15 +25,23 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-	try{
-		Vec v,v2(1);
-		v.setData(1,1);
-		v=v+v2;
-		ui->textBrowser->insertPlainText(QString::fromStdString(v.toString()));
-	}
-	catch(const char* e){
-		ui->textBrowser->insertPlainText(e);
-	}
+	QString inputStr = ui->lineEdit->text();
+	QString arg0=inputStr.split(' ')[0].toLower();
+	if(!arg0.compare("print"))
+		ui->textBrowser->insertPlainText(inputStr+'\n');
+	else if(!arg0.compare("cls"))
+		ui->textBrowser->setText(QString());
+
+
+//	try{
+//		Vec v,v2(1);
+//		v.setData(1,1);
+//		v=v+v2;
+//		ui->textBrowser->insertPlainText(QString::fromStdString(v.toString()));
+//	}
+//	catch(const char* e){
+//		ui->textBrowser->insertPlainText(e);
+//	}
 /*
 	QString inputStr = ui->lineEdit->text();
 	QString outputStr;
@@ -72,4 +84,9 @@ void MainWindow::on_pushButton_clicked()
 	outputStr+='\n';
 	ui->textBrowser->insertPlainText(outputStr);
 	*/
+}
+
+void MainWindow::on_actionOpen_triggered()
+{
+
 }
