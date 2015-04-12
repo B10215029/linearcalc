@@ -2,7 +2,6 @@
 #define MAT_H
 
 #include "Vec.h"
-#include <string>
 
 class Mat{
 protected:

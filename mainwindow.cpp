@@ -1,7 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "Vec.h"
-#include "Mat.h"
 #include <QStack>
 #include <QMap>
 #include <QFileDialog>
@@ -148,19 +146,19 @@ void MainWindow::on_lineEdit_returnPressed()
 void MainWindow::on_comboBox_activated(const QString &arg1)
 {
 	if(ui->comboBox->currentIndex())
-		ui->lineEdit->setText(ui->lineEdit->text()+arg1);
+		ui->lineEdit->insert(arg1);
 }
 
 void MainWindow::on_comboBox_2_activated(const QString &arg1)
 {
 	if(ui->comboBox_2->currentIndex())
-		ui->lineEdit->setText(ui->lineEdit->text()+arg1);
+		ui->lineEdit->insert(arg1);
 }
 
 void MainWindow::on_comboBox_3_activated(const QString &arg1)
 {
 	if(ui->comboBox_3->currentIndex())
-		ui->lineEdit->setText(ui->lineEdit->text()+arg1);
+		ui->lineEdit->insert(arg1);
 }
 
 void MainWindow::on_pushButton_2_clicked()
@@ -195,7 +193,7 @@ void MainWindow::on_pushButton_7_clicked()
 
 void MainWindow::on_pushButton_8_clicked()
 {
-
+	ui->lineEdit->setText("");
 }
 
 void MainWindow::on_pushButton_9_clicked()
@@ -210,6 +208,6 @@ void MainWindow::on_pushButton_10_clicked()
 		ostr+=QString::fromStdString(v[i].toString())+"\n";
 	for(int i=0;i<m.size();i++)
 		ostr+=QString::fromStdString(m[i].toString())+"\n";
-	ui->textBrowser->insertPlainText(ostr);
+	ui->textBrowser->append(ostr);
 
 }
