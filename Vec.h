@@ -1,7 +1,7 @@
 ﻿#ifndef VEC_H
 #define VEC_H
 
-#include <sstream>
+#include <string>
 
 class Vec{
 protected:
@@ -45,7 +45,8 @@ public:
 	double comp(Vec& v);
 	Vec proj(Vec& v);
 	Vec cross3(const Vec& v);
-	std::string toString();
 ////////// ////////// ////////// //////////
+	std::string toString();
 };
-#endif
+
+#endif // VEC_H

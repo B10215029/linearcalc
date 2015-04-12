@@ -2,12 +2,14 @@
 #define MAT_H
 
 #include "Vec.h"
+#include <string>
 
 class Mat{
 protected:
 	double** data;
 	int row,col;
-	inline void initData(int r,int c);
+	void initData(int r,int c);
+	void deleteData();
 public:
 	Mat();
 	Mat(int r,int c);
@@ -31,5 +33,8 @@ public:
 	Vec getColData(int c);
 	int getRow();
 	int getCol();
+////////// ////////// ////////// //////////
+	std::string toString();
 };
-#endif
+
+#endif // MAT_H

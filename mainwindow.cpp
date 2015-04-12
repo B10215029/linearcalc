@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QFileDialog>
 #include <QTextStream>
+#include <iostream> //debug用
 
 QString toPostfix(QString&inputStr);
 
@@ -117,6 +118,7 @@ void MainWindow::on_actionOpen_triggered()
 				vv.setData(d,j);
 			}
 			this->v.push_back(vv);
+			ui->comboBox->addItem(QString("V%1").arg(v.size()));
 		}
 		else if(line=="M"){
 			int col;
@@ -131,10 +133,8 @@ void MainWindow::on_actionOpen_triggered()
 				}
 			}
 			this->m.push_back(mm);
+			ui->comboBox_2->addItem(QString("M%1").arg(m.size()));
 		}
-	}
-	if(fname!=NULL){
-		ui->textBrowser->append(fname+"\n"+QString::fromStdString(this->v[0].toString()));
 	}
 }
 
@@ -198,5 +198,16 @@ void MainWindow::on_pushButton_8_clicked()
 
 void MainWindow::on_pushButton_9_clicked()
 {
+
+}
+
+void MainWindow::on_pushButton_10_clicked()
+{
+	QString ostr;
+	for(int i=0;i<v.size();i++)
+		ostr+=QString::fromStdString(v[i].toString())+"\n";
+	for(int i=0;i<m.size();i++)
+		ostr+=QString::fromStdString(m[i].toString())+"\n";
+	ui->textBrowser->insertPlainText(ostr);
 
 }
