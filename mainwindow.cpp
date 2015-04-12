@@ -100,16 +100,16 @@ void MainWindow::on_actionOpen_triggered()
 	QTextStream in(&f);
 	in.setCodec("UTF-8");
 
-	//first line is always int
+	//first input is always int
 	int num;
 	in>>num;
 
-	//Read line and Set v, m
-	QString line;
+	//Read dataType and Set v, m
+	QString dataType;
 	for(int i=num;i>0;i--){
-		in>>line;
+		in>>dataType;
 
-		if(line=="V"){
+		if(dataType=="V"){
 			in>>num;
 			Vec vv(num);
 			for(int j=0;j<num;j++){
@@ -120,7 +120,7 @@ void MainWindow::on_actionOpen_triggered()
 			this->v.push_back(vv);
 			ui->comboBox->addItem(QString("V%1").arg(v.size()));
 		}
-		else if(line=="M"){
+		else if(dataType=="M"){
 			int col;
 			in>>num;
 			in>>col;
@@ -136,6 +136,8 @@ void MainWindow::on_actionOpen_triggered()
 			ui->comboBox_2->addItem(QString("M%1").arg(m.size()));
 		}
 	}
+	//Output to TextBrowser
+	if(fname!=NULL) ui->textBrowser->append(fname+"\n");
 }
 
 void MainWindow::on_lineEdit_returnPressed()

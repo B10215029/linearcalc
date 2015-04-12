@@ -1,0 +1,32 @@
+﻿題目用到的運算
+向量
++		加法
+*		內積
+Norm		長度
+Normal		單位向量
+Cross		外積
+Com		投影向量的長度
+Proj		投影向量
+Area		
+isParallel	是否平行
+isOrthogonal	是否垂直
+angle		
+pN		
+IsLI		
+Ob		
+矩陣
++		加法
+*		乘法
+/		ax=b;x=a/b
+Rank		
+trans		轉置
+det		行列式
+Inverse		反矩陣
+Adj		
+eigenVec	特徵向量
+eigenVal	特徵數
+PM		
+LeastSquare	
+rref		
+L		下三角
+U		上三角
