@@ -39,6 +39,12 @@ Mat::Mat(Vec* v,int r,int c){
 		for(int j=0;j<c;j++)
 			data[i][j]=v[i].getData(j);
 }
+Mat::Mat(const Mat &m){
+	initData(m.row,m.col);
+	for(int i=0;i<row;i++)
+		for(int j=0;j<col;j++)
+			data[i][j]=m.data[i][j];
+}
 Mat::~Mat(){
 	deleteData();
 }
@@ -121,7 +127,7 @@ Vec Mat::getColData(int c){
 	if(c>=col||c<0) throw "getColData失敗，超出範圍!";
 	Vec v(row);
 	for(int i=0;i<row;i++)
-		v.setData(i,data[i][c]);
+		v.setData(data[i][c],i);
 	return v;
 }
 int Mat::getRow(){
@@ -129,6 +135,12 @@ int Mat::getRow(){
 }
 int Mat::getCol(){
 	return col;
+}
+Mat Mat::identity(int s){
+	Mat m(s,s);
+	for(int i=0;i<m.row;i++)
+		m.data[i][i]=1;
+	return m;
 }
 std::string Mat::toString(){
 	std::ostringstream out;

@@ -15,6 +15,7 @@ public:
 	Mat(int r,int c);
 	Mat(double** d,int r,int c);
 	Mat(Vec* v,int r,int c);
+	Mat(const Mat &m);
 	~Mat();
 ////////// ////////// ////////// //////////
 	Mat operator+(const Mat& m);
@@ -33,6 +34,7 @@ public:
 	Vec getColData(int c);
 	int getRow();
 	int getCol();
+	static Mat identity(int s);
 ////////// ////////// ////////// //////////
 	std::string toString();
 };
