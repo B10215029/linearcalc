@@ -1,6 +1,4 @@
 ﻿#include "Mat.h"
-#include <cmath>
-#include <sstream>
 
 void Mat::initData(int r,int c){
 	row=r;

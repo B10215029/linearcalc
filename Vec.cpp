@@ -1,6 +1,5 @@
 ﻿#include "Vec.h"
-#include <cmath>
-#include <sstream>
+
 #ifndef M_PI//有時候我需要切換許多的編譯器來DEBUG
 #define M_PI 3.1415926535897932384626
 #endif
