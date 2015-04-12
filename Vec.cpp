@@ -92,7 +92,7 @@ void Vec::setData(double d,int i){
 	data[i]=d;
 }
 double Vec::getData(int i){
-	if(i<=dim||i<0)
+	if(i>=dim||i<0)
 		throw "getData失敗，超出範圍!";
 	return data[i];
 }
@@ -164,17 +164,11 @@ Vec Vec::cross3(const Vec& v){
 	return re;
 }
 std::string Vec::toString(){
-	std::string out="";
+	std::ostringstream out;
 	for(int i=0;i<dim;++i){
-		if(i==0) out+="(";
-		if(i!=dim-1){
-			out+=data[i];
-			out+=", ";
-		}
-		else{
-			out+=data[i];
-			out+=")";
-		}
+		if(i==0) out<<"(";
+		if(i!=dim-1) out<<data[i]<<", ";
+		else out<<data[i]<<")";
 	}
-	return out;
+	return out.str();
 }

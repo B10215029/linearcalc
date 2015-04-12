@@ -99,16 +99,16 @@ void MainWindow::on_actionOpen_triggered()
 	QTextStream in(&f);
 	in.setCodec("UTF-8");
 
-	//first line is always int
+	//first input is always int
 	int num;
 	in>>num;
 
-	//Read line and Set v, m
-	QString line;
+	//Read data and Set v, m
+	QString data;
 	for(int i=num;i>0;i--){
-		in>>line;
+		in>>data;
 
-		if(line=="V"){
+		if(data=="V"){
 			in>>num;
 			Vec vv(num);
 			for(int j=0;j<num;j++){
@@ -118,7 +118,7 @@ void MainWindow::on_actionOpen_triggered()
 			}
 			this->v.push_back(vv);
 		}
-		else if(line=="M"){
+		else if(data=="M"){
 			int col;
 			in>>num;
 			in>>col;
@@ -133,9 +133,8 @@ void MainWindow::on_actionOpen_triggered()
 			this->m.push_back(mm);
 		}
 	}
-	if(fname!=NULL){
-		ui->textBrowser->append(fname+"\n"+QString::fromStdString(this->v[0].toString()));
-	}
+	//Output to TextBrowser
+	if(fname!=NULL) ui->textBrowser->append(fname+"\n");
 }
 
 void MainWindow::on_lineEdit_returnPressed()
