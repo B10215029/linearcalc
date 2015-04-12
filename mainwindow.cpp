@@ -6,8 +6,6 @@
 #include <QTextStream>
 #include <iostream> //debug用
 
-QString toPostfix(QString&inputStr);
-
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
@@ -18,29 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
 	delete ui;
-}
-
-void MainWindow::on_pushButton_clicked()
-{
-	QString inputStr = ui->lineEdit->text();
-	QString arg0=inputStr.split(' ')[0].toLower();
-	if(arg0=="print")
-		ui->textBrowser->insertPlainText(toPostfix(inputStr.split(' ')[1])+'\n');
-	else if(arg0=="cls")
-		ui->textBrowser->setText(QString());
-	else if(arg0=="add")
-		ui->textBrowser->insertPlainText(inputStr+'\n');
-
-
-//	try{
-//		Vec v,v2(1);
-//		v.setData(1,1);
-//		v=v+v2;
-//		ui->textBrowser->insertPlainText(QString::fromStdString(v.toString()));
-//	}
-//	catch(const char* e){
-//		ui->textBrowser->insertPlainText(e);
-//	}
 }
 
 QString toPostfix(QString &inputStr){
@@ -54,10 +29,10 @@ QString toPostfix(QString &inputStr){
 	operatorPriority["*"] = 3;
 	operatorPriority["/"] = 3;
 
-	for(int i=0;i<inputStr.length();++i){
-		if(inputStr[i] == 32)
-			continue;
-		else if(inputStr[i]>=48&&inputStr[i]<=57)
+	for(int i=0;i<inputStr.size();++i){
+//		if(inputStr[i] == 32)
+//			continue;
+		if(inputStr[i]>=48&&inputStr[i]<=57)
 			outputStr += inputStr[i];
 		else if(inputStr[i]>=65&&inputStr[i]<=90)
 			outputStr += inputStr[i];
@@ -72,7 +47,9 @@ QString toPostfix(QString &inputStr){
 			operatorStack.pop();
 		}
 		else if(QString("+-/ *").indexOf(inputStr[i])!=-1){
-			while(!operatorStack.isEmpty()&&operatorPriority.value(QString(operatorStack.top()))>=operatorPriority.value(QString(inputStr[i]))){
+			while(!operatorStack.isEmpty() &&
+				  operatorPriority.value(QString(operatorStack.top())) >=
+				  operatorPriority.value(QString(inputStr[i]))){
 				outputStr += operatorStack.pop();
 			}
 			operatorStack.push(inputStr[i]);
@@ -84,7 +61,35 @@ QString toPostfix(QString &inputStr){
 	return outputStr;
 }
 
-void MainWindow::on_actionOpen_triggered()
+void MainWindow::on_pushButton_clicked()
+{
+	QString inputStr= ui->lineEdit->text(), arg0, arg1;
+	QStringList args= inputStr.split(' ');
+
+	arg0= args[0].toLower();
+	for(int i=0;i<args.size();i++)
+		arg1+=args[i];
+
+	if(arg0=="print")
+		ui->textBrowser->append(toPostfix(arg1)+'\n');
+	else if(arg0=="cls")
+		ui->textBrowser->setText("");
+	else if(arg0=="add")
+		ui->textBrowser->append(inputStr+'\n');
+
+
+//	try{
+//		Vec v,v2(1);
+//		v.setData(1,1);
+//		v=v+v2;
+//		ui->textBrowser->insertPlainText(QString::fromStdString(v.toString()));
+//	}
+//	catch(const char* e){
+//		ui->textBrowser->insertPlainText(e);
+//	}
+}
+
+void MainWindow::on_actionOpen_triggered()//Qt讀檔方式
 {
 	//Open Dialog and Return file Directory
 	QString fname=QFileDialog::getOpenFileName(this,"Open File" , "../" , "Text(*.txt);;All(*)");
@@ -115,7 +120,9 @@ void MainWindow::on_actionOpen_triggered()
 				in>>d;
 				vv.setData(d,j);
 			}
-			this->v.push_back(vv);
+			v.push_back(vv);
+
+			//加到下拉選單中
 			ui->comboBox->addItem(QString("V%1").arg(v.size()));
 		}
 		else if(dataType=="M"){
@@ -128,9 +135,12 @@ void MainWindow::on_actionOpen_triggered()
 					double d;
 					in>>d;
 					mm.setData(d,r,c);
+					//ui->textBrowser->append(QString::number(mm.getRowData(r).getData(c)));
 				}
 			}
-			this->m.push_back(mm);
+			m.push_back(mm);
+
+			//加到下拉選單中
 			ui->comboBox_2->addItem(QString("M%1").arg(m.size()));
 		}
 	}

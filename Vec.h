@@ -12,7 +12,7 @@ public:
 	Vec(void);
 	Vec(int s);
 	Vec(double* d,int s);
-	Vec(const Vec &v);
+	Vec(const Vec &v);//----Asign
 	~Vec();
 ////////// ////////// ////////// //////////
 	Vec operator+(const Vec& v);

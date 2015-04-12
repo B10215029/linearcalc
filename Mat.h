@@ -14,6 +14,7 @@ public:
 	Mat(int r,int c);
 	Mat(double** d,int r,int c);
 	Mat(Vec* v,int r,int c);
+	Mat(const Mat &m);//----Asign
 	~Mat();
 ////////// ////////// ////////// //////////
 	Mat operator+(const Mat& m);
