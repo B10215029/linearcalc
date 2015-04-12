@@ -14,11 +14,7 @@ public:
 	Mat(int r,int c);
 	Mat(double** d,int r,int c);
 	Mat(Vec* v,int r,int c);
-<<<<<<< HEAD
-	Mat(const Mat &m);//----Asign
-=======
 	Mat(const Mat &m);
->>>>>>> 6dfeae8a5653306f36e148f09798332b31869476
 	~Mat();
 ////////// ////////// ////////// //////////
 	Mat operator+(const Mat& m);
