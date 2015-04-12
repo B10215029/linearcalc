@@ -18,6 +18,32 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
+<<<<<<< HEAD
+=======
+void MainWindow::on_pushButton_clicked()
+{
+	QString inputStr = ui->lineEdit->text();
+	QString arg0=inputStr.split(' ')[0].toLower();
+	if(arg0=="print")
+		ui->textBrowser->append(toPostfix(inputStr.split(' ')[1])+'\n');
+	else if(arg0=="cls")
+		ui->textBrowser->setText(QString());
+	else if(arg0=="add")
+		ui->textBrowser->append(inputStr+'\n');
+	//ui->textBrowser->append(QString::fromStdString(Mat::identity(100).toString()));
+
+//	try{
+//		Vec v,v2(1);
+//		v.setData(1,1);
+//		v=v+v2;
+//		ui->textBrowser->append(QString::fromStdString(v.toString()));
+//	}
+//	catch(const char* e){
+//		ui->textBrowser->append(e);
+//	}
+}
+
+>>>>>>> 6dfeae8a5653306f36e148f09798332b31869476
 QString toPostfix(QString &inputStr){
 	QString outputStr;
 	QStack<QChar> operatorStack;
@@ -219,5 +245,4 @@ void MainWindow::on_pushButton_10_clicked()
 	for(int i=0;i<m.size();i++)
 		ostr+=QString::fromStdString(m[i].toString())+"\n";
 	ui->textBrowser->append(ostr);
-
 }

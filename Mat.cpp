@@ -134,6 +134,12 @@ int Mat::getRow(){
 int Mat::getCol(){
 	return col;
 }
+Mat Mat::identity(int s){
+	Mat m(s,s);
+	for(int i=0;i<m.row;i++)
+		m.data[i][i]=1;
+	return m;
+}
 std::string Mat::toString(){
 	std::ostringstream out;
 	for(int i=0;i<row;i++){
