@@ -12,7 +12,7 @@ public:
 	Vec(void);
 	Vec(int s);
 	Vec(double* d,int s);
-	Vec(const Vec &v);//----Asign
+	Vec(const Vec& v);//----Asign
 	~Vec();
 ////////// ////////// ////////// //////////
 	Vec operator+(const Vec& v);
@@ -46,6 +46,10 @@ public:
 	double comp(Vec& v);
 	Vec proj(Vec& v);
 	Vec cross3(const Vec& v);
+	double cross3_norm(const Vec& v);
+	bool isParallel(const Vec& v);
+	bool isOrthogonal(const Vec& v);
+	bool IsLI(const Vec& v);
 ////////// ////////// ////////// //////////
 	std::string toString();
 };

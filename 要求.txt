@@ -13,7 +13,7 @@ isOrthogonal	是否垂直
 angle		
 pN		
 IsLI		
-Ob		
+Ob		orthonormal basis
 矩陣
 +		加法
 *		乘法

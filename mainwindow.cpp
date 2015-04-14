@@ -1,10 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QStack>
-#include <QMap>
-#include <QFileDialog>
-#include <QTextStream>
-#include <iostream> //debug用
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -32,11 +27,11 @@ QString toPostfix(QString &inputStr){
 	for(int i=0;i<inputStr.size();++i){
 //		if(inputStr[i] == 32)
 //			continue;
-		if(inputStr[i]>=48&&inputStr[i]<=57)
+		if(inputStr[i]>=48&&inputStr[i]<=57)//0~9
 			outputStr += inputStr[i];
-		else if(inputStr[i]>=65&&inputStr[i]<=90)
+		else if(inputStr[i]>=65&&inputStr[i]<=90)//A~Z
 			outputStr += inputStr[i];
-		else if(inputStr[i]>=97&&inputStr[i]<=122)
+		else if(inputStr[i]>=97&&inputStr[i]<=122)//a~z
 			outputStr += inputStr[i].toUpper();
 
 		else if(inputStr[i] == '(')
@@ -47,11 +42,11 @@ QString toPostfix(QString &inputStr){
 			operatorStack.pop();
 		}
 		else if(QString("+-/ *").indexOf(inputStr[i])!=-1){
-			while(!operatorStack.isEmpty() &&
+			while(!operatorStack.isEmpty() && //有東西的話
 				  operatorPriority.value(QString(operatorStack.top())) >=
-				  operatorPriority.value(QString(inputStr[i]))){
-				outputStr += operatorStack.pop();
-			}
+				  operatorPriority.value(QString(inputStr[i]))) //裡面的東西比較大的話
+				outputStr += operatorStack.pop(); //就把他丟出來
+
 			operatorStack.push(inputStr[i]);
 		}
 	}
@@ -70,8 +65,43 @@ void MainWindow::on_pushButton_clicked()
 	for(int i=0;i<args.size();i++)
 		arg1+=args[i];
 
-	if(arg0=="print")
-		ui->textBrowser->append(toPostfix(arg1)+'\n');
+	if(arg0=="print"){
+		QString s=toPostfix(arg1);
+		ui->textBrowser->append(s+'\n');
+		//之後判斷是何種func
+//		for(int i=0;i<s.size();i++){
+//			if(s[i]=="V"){
+//				int x=1;
+//				QString n;
+//				while(s[i+x]>=48&&s[i+x]<=57){
+
+//					n+=s[i+x];
+//					x++;
+//				}
+//				bool ok;
+//				int nn=s.toInt(&ok);
+//				if(!ok){
+//					ui->textBrowser->append("fail to int");
+//					return;
+//				}
+//				nn--;
+
+//			}
+//			if(s[i]=="+"){
+
+//			}
+//			else if(s[i]=="-"){
+
+//			}
+//			else if(s[i]=="*"){
+
+//			}
+//			else if(s[i]=="/"){
+
+//			}
+//		}
+		//
+	}
 	else if(arg0=="cls")
 		ui->textBrowser->setText("");
 	else if(arg0=="add")
@@ -135,7 +165,6 @@ void MainWindow::on_actionOpen_triggered()//Qt讀檔方式
 					double d;
 					in>>d;
 					mm.setData(d,r,c);
-					//ui->textBrowser->append(QString::number(mm.getRowData(r).getData(c)));
 				}
 			}
 			m.push_back(mm);
@@ -208,7 +237,8 @@ void MainWindow::on_pushButton_8_clicked()
 
 void MainWindow::on_pushButton_9_clicked()
 {
-
+	//test
+	ui->textBrowser->append(QString::number(m[2].det()));
 }
 
 void MainWindow::on_pushButton_10_clicked()

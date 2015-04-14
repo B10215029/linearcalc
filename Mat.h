@@ -9,12 +9,13 @@ protected:
 	int row,col;
 	void initData(int r,int c);
 	void deleteData();
+	Mat minor_mat(int r, int c);
 public:
 	Mat();
 	Mat(int r,int c);
 	Mat(double** d,int r,int c);
 	Mat(Vec* v,int r,int c);
-	Mat(const Mat &m);
+	Mat(const Mat& m);
 	~Mat();
 ////////// ////////// ////////// //////////
 	Mat operator+(const Mat& m);
@@ -34,6 +35,10 @@ public:
 	int getRow();
 	int getCol();
 	static Mat identity(int s);
+	int Rank();
+	Mat trans();
+	double cofactor(int r,int c);
+	double det();
 ////////// ////////// ////////// //////////
 	std::string toString();
 };

@@ -19,7 +19,7 @@ Vec::Vec(double* d,int s):dim(s){
 	for(int i=0;i<s;i++)
 		data[i]=d[i];
 }
-Vec::Vec(const Vec &v){//----Asign
+Vec::Vec(const Vec& v){//----Asign
 	dim=v.dim;
 	data=new double[dim];
 	for(int i=0;i<dim;i++)
@@ -182,6 +182,20 @@ Vec Vec::cross3(const Vec& v){
 	re.data[1]=data[0]*v.data[2]-data[2]*v.data[0];
 	re.data[2]=data[0]*v.data[1]-data[1]*v.data[0];
 	return re;
+}
+double Vec::cross3_norm(const Vec& v){
+	return cross3(v).norm();
+}
+bool Vec::isParallel(const Vec& v){
+	if(dot(v)==1||dot(v)==-1) return true;
+	return false;
+}
+bool Vec::isOrthogonal(const Vec& v){
+	if(dot(v)==0) return true;
+	return false;
+}
+bool Vec::IsLI(const Vec& v){
+	return isOrthogonal(v);
 }
 std::string Vec::toString(){
 	std::ostringstream out;

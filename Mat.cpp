@@ -37,7 +37,7 @@ Mat::Mat(Vec* v,int r,int c){
 		for(int j=0;j<c;j++)
 			data[i][j]=v[i].getData(j);
 }
-Mat::Mat(const Mat &m){
+Mat::Mat(const Mat& m){
 	initData(m.row,m.col);
 	for(int i=0;i<row;i++)
 		for(int j=0;j<col;j++)
@@ -139,6 +139,52 @@ Mat Mat::identity(int s){
 	for(int i=0;i<m.row;i++)
 		m.data[i][i]=1;
 	return m;
+}
+int Mat::Rank(){//so hard...
+	return row;
+}
+Mat Mat::trans(){
+	Mat m(row,col);
+	for(int i=0;i<row;i++)
+		for(int j=0;j<col;j++)
+			m.data[i][j]=data[j][i];
+	return m;
+}
+Mat Mat::minor_mat(int r,int c){
+	Mat m(row-1,col-1);
+	for(int i=0,mi=0;i<row;i++){
+		if(i==r) continue;
+		for(int j=0,mj=0;j<col;j++){
+			if(j==c) continue;
+			m.setData(data[i][j],mi,mj++);
+		}
+		mi++;
+	}
+	return m;
+}
+double Mat::cofactor(int r, int c){
+	return pow(-1,r+c)*minor_mat(r,c).det();
+}
+double Mat::det(){
+	if(row!=col)
+		throw "det失敗，not square matrix!";
+	else if(row==3)
+		return
+				data[0][0]*data[1][1]*data[2][2]+
+				data[0][1]*data[1][2]*data[2][0]+
+				data[0][2]*data[1][0]*data[2][1]-
+
+				data[0][2]*data[1][1]*data[2][0]-
+				data[0][0]*data[1][2]*data[2][1]-
+				data[0][1]*data[1][0]*data[2][2];
+	else if(row==2)
+		return data[0][0]*data[1][1]-data[0][1]*data[1][0];
+	else if(row==1)
+		return data[0][0];
+	double x=0;
+	for(int i=0;i<col;i++)
+		x+=data[0][i]*pow(-1,0+i)*minor_mat(0,i).det();
+	return x;
 }
 std::string Mat::toString(){
 	std::ostringstream out;
