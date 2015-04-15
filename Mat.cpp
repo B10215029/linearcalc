@@ -37,6 +37,11 @@ Mat::Mat(Vec* v,int r,int c){
 		for(int j=0;j<c;j++)
 			data[i][j]=v[i].getData(j);
 }
+Mat::Mat(Vec& v){
+	initData(1,v.getDim());
+	for(int i=0;i<v.getDim();i++)
+		data[0][i]=v.getData(i);
+}
 Mat::Mat(const Mat& m){
 	initData(m.row,m.col);
 	for(int i=0;i<row;i++)
@@ -144,10 +149,10 @@ int Mat::Rank(){//so hard...
 	return row;
 }
 Mat Mat::trans(){
-	Mat m(row,col);
+	Mat m(col,row);
 	for(int i=0;i<row;i++)
 		for(int j=0;j<col;j++)
-			m.data[i][j]=data[j][i];
+			data[i][j]=m.data[j][i];
 	return m;
 }
 Mat Mat::minor_mat(int r,int c){

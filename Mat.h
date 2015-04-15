@@ -15,6 +15,7 @@ public:
 	Mat(int r,int c);
 	Mat(double** d,int r,int c);
 	Mat(Vec* v,int r,int c);
+	Mat(Vec& v);
 	Mat(const Mat& m);
 	~Mat();
 ////////// ////////// ////////// //////////

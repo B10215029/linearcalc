@@ -41,7 +41,7 @@ QString toPostfix(QString &inputStr){
 				outputStr += operatorStack.pop();
 			operatorStack.pop();
 		}
-		else if(QString("+-/ *").indexOf(inputStr[i])!=-1){
+		else if(QString("+*-/").indexOf(inputStr[i])!=-1){
 			while(!operatorStack.isEmpty() && //有東西的話
 				  operatorPriority.value(QString(operatorStack.top())) >=
 				  operatorPriority.value(QString(inputStr[i]))) //裡面的東西比較大的話
@@ -54,6 +54,12 @@ QString toPostfix(QString &inputStr){
 	while(!operatorStack.empty())
 		outputStr += operatorStack.pop();
 	return outputStr;
+}
+//只計算+*-/等operator
+//不管是向量還是矩陣都用矩陣回傳
+Mat calc(QString &inputStr){
+	QStack<Mat> stack;//Mat不管向量還是矩陣都能裝
+
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -68,6 +74,8 @@ void MainWindow::on_pushButton_clicked()
 	if(arg0=="print"){
 		QString s=toPostfix(arg1);
 		ui->textBrowser->append(s+'\n');
+		//可以呼叫calc計算
+
 		//之後判斷是何種func
 //		for(int i=0;i<s.size();i++){
 //			if(s[i]=="V"){
@@ -104,7 +112,9 @@ void MainWindow::on_pushButton_clicked()
 	}
 	else if(arg0=="cls")
 		ui->textBrowser->setText("");
-	else if(arg0=="add")
+	else if(arg0=="指令A")
+		ui->textBrowser->append(inputStr+'\n');
+	else if(arg0=="指令B")
 		ui->textBrowser->append(inputStr+'\n');
 
 
@@ -177,76 +187,86 @@ void MainWindow::on_actionOpen_triggered()//Qt讀檔方式
 	if(fname!=NULL) ui->textBrowser->append(fname+"\n");
 }
 
-void MainWindow::on_lineEdit_returnPressed()
+void MainWindow::on_lineEdit_returnPressed()//在指令輸入按下Enter鍵
 {
-	this->on_pushButton_clicked();
+	this->on_pushButton_clicked();//等同按下RUN鍵
 }
 
-void MainWindow::on_comboBox_activated(const QString &arg1)
+void MainWindow::on_comboBox_activated(const QString &arg1)//選擇向量
 {
 	if(ui->comboBox->currentIndex())
 		ui->lineEdit->insert(arg1);
 }
 
-void MainWindow::on_comboBox_2_activated(const QString &arg1)
+void MainWindow::on_comboBox_2_activated(const QString &arg1)//選擇矩陣
 {
 	if(ui->comboBox_2->currentIndex())
 		ui->lineEdit->insert(arg1);
 }
 
-void MainWindow::on_comboBox_3_activated(const QString &arg1)
+void MainWindow::on_comboBox_3_activated(const QString &arg1)//選擇常數
 {
 	if(ui->comboBox_3->currentIndex())
 		ui->lineEdit->insert(arg1);
 }
 
-void MainWindow::on_pushButton_2_clicked()
+void MainWindow::on_pushButton_2_clicked()// '+'
 {
 	ui->lineEdit->insert("+");
 }
 
-void MainWindow::on_pushButton_3_clicked()
+void MainWindow::on_pushButton_3_clicked()// '-'
 {
 	ui->lineEdit->insert("-");
 }
 
-void MainWindow::on_pushButton_4_clicked()
+void MainWindow::on_pushButton_4_clicked()// '*'
 {
 	ui->lineEdit->insert("*");
 }
 
-void MainWindow::on_pushButton_5_clicked()
+void MainWindow::on_pushButton_5_clicked()// '/'
 {
 	ui->lineEdit->insert("/");
 }
 
-void MainWindow::on_pushButton_6_clicked()
+void MainWindow::on_pushButton_6_clicked()//print:用於只有+*-/的運算式或是直接輸出某個變數
 {
 	ui->lineEdit->setText("Print ");
 }
 
-void MainWindow::on_pushButton_7_clicked()
+void MainWindow::on_pushButton_7_clicked()//清除輸出
 {
 	ui->textBrowser->setText("");
 }
 
-void MainWindow::on_pushButton_8_clicked()
+void MainWindow::on_pushButton_8_clicked()//清除輸入
 {
 	ui->lineEdit->setText("");
 }
 
-void MainWindow::on_pushButton_9_clicked()
+void MainWindow::on_pushButton_9_clicked()//未定義
 {
 	//test
 	ui->textBrowser->append(QString::number(m[2].det()));
 }
 
-void MainWindow::on_pushButton_10_clicked()
+void MainWindow::on_pushButton_10_clicked()//未定義
 {
-	QString ostr;
-	for(int i=0;i<v.size();i++)
-		ostr+=QString::fromStdString(v[i].toString())+"\n";
-	for(int i=0;i<m.size();i++)
-		ostr+=QString::fromStdString(m[i].toString())+"\n";
-	ui->textBrowser->append(ostr);
+	//我只是拿來測試一下東西
+//	QString ostr;
+//	for(int i=0;i<v.size();i++)
+//		ostr+=QString::fromStdString(v[i].toString())+"\n";
+//	for(int i=0;i<m.size();i++)
+//		ostr+=QString::fromStdString(m[i].toString())+"\n";
+//	ui->textBrowser->append(ostr);
+	Mat a(10,2);
+	Mat b=a.trans();
+	b.setI();
+	b.setData(b.getRow(),0,0);
+	Vec va(10);
+	va.setI();
+	b=b*Mat(va).trans();
+	//ui->textBrowser->append(QString::fromStdString(a.toString()));
+	ui->textBrowser->append(QString::fromStdString(b.toString()));
 }
