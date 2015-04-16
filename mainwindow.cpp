@@ -25,8 +25,6 @@ QString MainWindow::toPostfix(QString &inputStr){
 	operatorPriority["/"] = 3;
 
 	for(int i=0;i<inputStr.size();++i){
-//		if(inputStr[i] == 32)
-//			continue;
 		if(inputStr[i]>=48&&inputStr[i]<=57)//0~9
 			outputStr += inputStr[i];
 		else if(inputStr[i]>=65&&inputStr[i]<=90)//A~Z
@@ -64,7 +62,6 @@ Mat MainWindow::calc(QString &inputStr){
 			//這樣的寫法只能讀10個值
 			//toLatin1可以把QChar轉成char
 			//Latin-1編碼前127字類似Ascii
-			//我找不到toAscii
 			stack.push(Mat(v[inputStr[++i].toLatin1()-49]));
 
 		else if(inputStr[i]=='M')
@@ -77,8 +74,12 @@ Mat MainWindow::calc(QString &inputStr){
 		else if(inputStr[i]=='-')
 			stack.push(stack.pop()-stack.pop());
 		else if(inputStr[i]=='*'){
-			Mat m=stack.pop();
-			stack.push(stack.pop()*m);
+			Mat m1=stack.pop();
+			Mat m2=stack.pop();
+			if(m1.getRow()==1&&m1.getCol()==m2.getCol())
+				stack.push(m2*m1.trans());
+			else
+				stack.push(m2*m1);
 		}
 	}
 	return stack.pop();
@@ -149,59 +150,61 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_actionOpen_triggered()//Qt讀檔方式
 {
 	//Open Dialog and Return file Directory
-	QString fname=QFileDialog::getOpenFileName(this,"Open File" , "../" , "Text(*.txt);;All(*)");
+	QStringList fnames=QFileDialog::getOpenFileNames(this,"Open File" , "../" , "Text(*.txt);;All(*)");
 
-	QFile f(fname);
+	for(int i=0;i<fnames.size();i++){
+		QFile f(fnames[i]);
 
-	//Open File and test whether it is error
-	if(!f.open(QIODevice::ReadOnly)) ui->textBrowser->append(fname+"[Open File Error]");
+		//Open File and test whether it is error
+		if(!f.open(QIODevice::ReadOnly)) ui->textBrowser->append(fnames[i]+"[Open File Error]");
 
-	//to stream like c++ cin
-	QTextStream in(&f);
-	in.setCodec("UTF-8");
+		//to stream like c++ cin
+		QTextStream in(&f);
+		in.setCodec("UTF-8");
 
-	//first input is always int
-	int num;
-	in>>num;
+		//first input is always int
+		int num;
+		in>>num;
 
-	//Read dataType and Set v, m
-	QString dataType;
-	for(int i=num;i>0;i--){
-		in>>dataType;
+		//Read dataType and Set v, m
+		QString dataType;
+		for(int i=num;i>0;i--){
+			in>>dataType;
 
-		if(dataType=="V"){
-			in>>num;
-			Vec vv(num);
-			for(int j=0;j<num;j++){
-				double d;
-				in>>d;
-				vv.setData(d,j);
-			}
-			v.push_back(vv);
-
-			//加到下拉選單中
-			ui->comboBox->addItem(QString("V%1").arg(v.size()));
-		}
-		else if(dataType=="M"){
-			int col;
-			in>>num;
-			in>>col;
-			Mat mm(num,col);
-			for(int r=0;r<num;r++){
-				for(int c=0;c<col;c++){
+			if(dataType=="V"){
+				in>>num;
+				Vec vv(num);
+				for(int j=0;j<num;j++){
 					double d;
 					in>>d;
-					mm.setData(d,r,c);
+					vv.setData(d,j);
 				}
-			}
-			m.push_back(mm);
+				v.push_back(vv);
 
-			//加到下拉選單中
-			ui->comboBox_2->addItem(QString("M%1").arg(m.size()));
+				//加到下拉選單中
+				ui->comboBox->addItem(QString("V%1").arg(v.size()));
+			}
+			else if(dataType=="M"){
+				int col;
+				in>>num;
+				in>>col;
+				Mat mm(num,col);
+				for(int r=0;r<num;r++){
+					for(int c=0;c<col;c++){
+						double d;
+						in>>d;
+						mm.setData(d,r,c);
+					}
+				}
+				m.push_back(mm);
+
+				//加到下拉選單中
+				ui->comboBox_2->addItem(QString("M%1").arg(m.size()));
+			}
 		}
+		//Output to TextBrowser
+		if(fnames[i]!=NULL) ui->textBrowser->append(fnames[i]+"\n");
 	}
-	//Output to TextBrowser
-	if(fname!=NULL) ui->textBrowser->append(fname+"\n");
 }
 
 void MainWindow::on_lineEdit_returnPressed()//在指令輸入按下Enter鍵
@@ -286,4 +289,9 @@ void MainWindow::on_pushButton_10_clicked()//未定義
 	b=b*Mat(va).trans();
 	//ui->textBrowser->append(QString::fromStdString(a.toString()));
 	ui->textBrowser->append(QString::fromStdString(b.toString()));
+}
+
+void MainWindow::on_actionSave_triggered()
+{
+	//把輸出存成檔案(不重要，有空再做)
 }

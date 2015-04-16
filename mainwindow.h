@@ -56,6 +56,8 @@ private slots:
 
 	void on_pushButton_10_clicked();
 
+	void on_actionSave_triggered();
+
 private:
 	Ui::MainWindow *ui;
 	QVector<Vec> v;

@@ -70,7 +70,7 @@ Mat Mat::operator-(const Mat& m){//operator override -
 }
 Mat Mat::operator*(const Mat& m){//operator override *
 	if(col!=m.row) throw "*失敗，維度不同!";
-	Mat re(row,col);
+	Mat re(row,m.col);
 	for(int i=0;i<row;i++)
 		for(int j=0;j<m.col;j++)
 			for(int k=0;k<col;k++)
