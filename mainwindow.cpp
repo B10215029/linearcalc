@@ -25,11 +25,9 @@ QString MainWindow::toPostfix(QString &inputStr){
 	operatorPriority["/"] = 3;
 
 	for(int i=0;i<inputStr.size();++i){
-		if(inputStr[i]>=48&&inputStr[i]<=57)//0~9
+		if(inputStr[i].isDigit())//0~9
 			outputStr += inputStr[i];
-		else if(inputStr[i]>=65&&inputStr[i]<=90)//A~Z
-			outputStr += inputStr[i];
-		else if(inputStr[i]>=97&&inputStr[i]<=122)//a~z
+		else if(inputStr[i].isLetter())//A~Z or a~z
 			outputStr += inputStr[i].toUpper();
 
 		else if(inputStr[i] == '(')
@@ -59,16 +57,19 @@ Mat MainWindow::calc(QString &inputStr){
 	QStack<Mat> stack;//Mat不管向量還是矩陣都能裝
 	for(int i=0;i<inputStr.length();++i){
 		if(inputStr[i]=='V')
-			//這樣的寫法只能讀10個值
+			//這樣的寫法只能讀26個值
 			//toLatin1可以把QChar轉成char
 			//Latin-1編碼前127字類似Ascii
-			stack.push(Mat(v[inputStr[++i].toLatin1()-49]));
-
+			stack.push(Mat(v[inputStr[++i].toLatin1()-65]));
 		else if(inputStr[i]=='M')
-			stack.push(m[inputStr[++i].toLatin1()-49]);
-		//這個也只能判斷0~9並且常數只能在要乘的東西後面
-		else if(inputStr[i].isDigit())
-			stack.push(Mat::identity(stack.top().getCol())*(inputStr[i].toLatin1()-48));
+			stack.push(m[inputStr[++i].toLatin1()-65]);
+		//這個常數只能在要乘的東西後面
+		else if(inputStr[i].isDigit()){
+			int num = inputStr[i].toLatin1()-48;
+			while(inputStr[i+1].isDigit())
+				num = num*10+inputStr[++i].toLatin1()-48;
+			stack.push(Mat::identity(stack.top().getCol())*num);//依照他前面一個矩陣的大小來決定這個的大小
+		}
 		else if(inputStr[i]=='+')
 			stack.push(stack.pop()+stack.pop());
 		else if(inputStr[i]=='-')
@@ -76,11 +77,15 @@ Mat MainWindow::calc(QString &inputStr){
 		else if(inputStr[i]=='*'){
 			Mat m1=stack.pop();
 			Mat m2=stack.pop();
-			if(m1.getRow()==1&&m1.getCol()==m2.getCol())
+			if(m1.getRow()==1&&m1.getCol()==m2.getCol())//依情況把m1轉置
 				stack.push(m2*m1.trans());
 			else
 				stack.push(m2*m1);
 		}
+//		else if(inputStr[i]=='/'){
+//			Mat m=stack.pop();
+//			stack.push(stack.pop()/m);
+//		}
 	}
 	return stack.pop();
 }
@@ -90,11 +95,11 @@ void MainWindow::on_pushButton_clicked()
 	QString inputStr= ui->lineEdit->text(), arg0, arg1;
 	QStringList args= inputStr.split(' ');
 
-	arg0= args[0].toLower();
-	for(int i=0;i<args.size();i++)
+	arg0 = args[0] = args[0].toLower();
+	for(int i=1;i<args.size();i++)
 		arg1+=args[i];
 
-	if(arg0=="print"){
+	if(args[0]=="print"){
 		QString s=toPostfix(arg1);
 		ui->textBrowser->append(s+'\n');
 		try{
@@ -103,46 +108,28 @@ void MainWindow::on_pushButton_clicked()
 		catch(const char* e){
 			ui->textBrowser->append(e);
 		}
-
-		//之後判斷是何種func
-//		for(int i=0;i<s.size();i++){
-//			if(s[i]=="V"){
-//				int x=1;
-//				QString n;
-//				while(s[i+x]>=48&&s[i+x]<=57){
-
-//					n+=s[i+x];
-//					x++;
-//				}
-//				bool ok;
-//				int nn=s.toInt(&ok);
-//				if(!ok){
-//					ui->textBrowser->append("fail to int");
-//					return;
-//				}
-//				nn--;
-
-//			}
-//			if(s[i]=="+"){
-
-//			}
-//			else if(s[i]=="-"){
-
-//			}
-//			else if(s[i]=="*"){
-
-//			}
-//			else if(s[i]=="/"){
-
-//			}
-//		}
-		//
 	}
-	else if(arg0=="cls")
+	else if(args[0]=="cls")//清除輸出畫面
 		ui->textBrowser->setText("");
-	else if(arg0=="指令A")
-		ui->textBrowser->append(inputStr+'\n');
-	else if(arg0=="指令B")
+	else if(args[0]=="new"){//手動新增變數(格式如輸入檔案)(沒有輸入錯誤的判斷)
+		if(args[1].toUpper()=="V"){
+			Vec vv(args[2].toInt());
+			for(int r=0;r<vv.getDim();r++)
+				vv.setData(args[3+r].toDouble(),r);
+			v.push_back(vv);
+			ui->comboBox->addItem(QString("V%1").arg((char)(96+v.size())));
+		}
+		else if(args[1].toUpper()=="M"){
+			Mat mm(args[2].toInt(),args[3].toInt());
+			int k=0;
+			for(int r=0;r<mm.getRow();r++)
+				for(int c=0;c<mm.getCol();c++)
+					mm.setData(args[4+k++].toDouble(),r,c);
+			m.push_back(mm);
+			ui->comboBox_2->addItem(QString("M%1").arg((char)(96+m.size())));
+		}
+	}
+	else if(args[0]=="指令B")
 		ui->textBrowser->append(inputStr+'\n');
 
 }
@@ -152,11 +139,11 @@ void MainWindow::on_actionOpen_triggered()//Qt讀檔方式
 	//Open Dialog and Return file Directory
 	QStringList fnames=QFileDialog::getOpenFileNames(this,"Open File" , "../" , "Text(*.txt);;All(*)");
 
-	for(int i=0;i<fnames.size();i++){
-		QFile f(fnames[i]);
+	for(int ni=0;ni<fnames.size();ni++){
+		QFile f(fnames[ni]);
 
 		//Open File and test whether it is error
-		if(!f.open(QIODevice::ReadOnly)) ui->textBrowser->append(fnames[i]+"[Open File Error]");
+		if(!f.open(QIODevice::ReadOnly)) ui->textBrowser->append(fnames[ni]+"[Open File Error]");
 
 		//to stream like c++ cin
 		QTextStream in(&f);
@@ -182,7 +169,7 @@ void MainWindow::on_actionOpen_triggered()//Qt讀檔方式
 				v.push_back(vv);
 
 				//加到下拉選單中
-				ui->comboBox->addItem(QString("V%1").arg(v.size()));
+				ui->comboBox->addItem(QString("V%1").arg((char)(96+v.size())));
 			}
 			else if(dataType=="M"){
 				int col;
@@ -199,11 +186,11 @@ void MainWindow::on_actionOpen_triggered()//Qt讀檔方式
 				m.push_back(mm);
 
 				//加到下拉選單中
-				ui->comboBox_2->addItem(QString("M%1").arg(m.size()));
+				ui->comboBox_2->addItem(QString("M%1").arg((char)(96+m.size())));
 			}
 		}
 		//Output to TextBrowser
-		if(fnames[i]!=NULL) ui->textBrowser->append(fnames[i]+"\n");
+		if(fnames[ni]!=NULL) ui->textBrowser->append(fnames[ni]+"\n");
 	}
 }
 
