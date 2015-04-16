@@ -77,6 +77,13 @@ Mat Mat::operator*(const Mat& m){//operator override *
 				re.data[i][j]+=data[i][k]*m.data[k][j];
 	return re;
 }
+Mat Mat::operator*(const double c){//operator override *
+	Mat re(row,col);
+	for(int i=0;i<row;i++)
+		for(int j=0;j<col;j++)
+			re.data[i][j]=data[i][j]*c;
+	return re;
+}
 Mat Mat::operator=(const Mat& m){//operator override =
 	deleteData();
 	initData(m.row,m.col);
@@ -150,9 +157,9 @@ int Mat::Rank(){//so hard...
 }
 Mat Mat::trans(){
 	Mat m(col,row);
-	for(int i=0;i<row;i++)
-		for(int j=0;j<col;j++)
-			data[i][j]=m.data[j][i];
+	for(int i=0;i<m.row;i++)
+		for(int j=0;j<m.col;j++)
+			m.data[i][j]=data[j][i];
 	return m;
 }
 Mat Mat::minor_mat(int r,int c){

@@ -22,6 +22,7 @@ public:
 	Mat operator+(const Mat& m);
 	Mat operator-(const Mat& m);
 	Mat operator*(const Mat& m);
+	Mat operator*(const double c);
 	Mat operator=(const Mat& m);
 	//cout<< 可能用不到
 	//friend ostream& operator<<(ostream&,const Mat&);

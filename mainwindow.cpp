@@ -13,7 +13,7 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
-QString toPostfix(QString &inputStr){
+QString MainWindow::toPostfix(QString &inputStr){
 	QString outputStr;
 	QStack<QChar> operatorStack;
 	QMap<QString,int> operatorPriority;
@@ -57,9 +57,31 @@ QString toPostfix(QString &inputStr){
 }
 //只計算+*-/等operator
 //不管是向量還是矩陣都用矩陣回傳
-Mat calc(QString &inputStr){
+Mat MainWindow::calc(QString &inputStr){
 	QStack<Mat> stack;//Mat不管向量還是矩陣都能裝
+	for(int i=0;i<inputStr.length();++i){
+		if(inputStr[i]=='V')
+			//這樣的寫法只能讀10個值
+			//toLatin1可以把QChar轉成char
+			//Latin-1編碼前127字類似Ascii
+			//我找不到toAscii
+			stack.push(Mat(v[inputStr[++i].toLatin1()-49]));
 
+		else if(inputStr[i]=='M')
+			stack.push(m[inputStr[++i].toLatin1()-49]);
+		//這個也只能判斷0~9並且常數只能在要乘的東西後面
+		else if(inputStr[i].isDigit())
+			stack.push(Mat::identity(stack.top().getCol())*(inputStr[i].toLatin1()-48));
+		else if(inputStr[i]=='+')
+			stack.push(stack.pop()+stack.pop());
+		else if(inputStr[i]=='-')
+			stack.push(stack.pop()-stack.pop());
+		else if(inputStr[i]=='*'){
+			Mat m=stack.pop();
+			stack.push(stack.pop()*m);
+		}
+	}
+	return stack.pop();
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -74,7 +96,12 @@ void MainWindow::on_pushButton_clicked()
 	if(arg0=="print"){
 		QString s=toPostfix(arg1);
 		ui->textBrowser->append(s+'\n');
-		//可以呼叫calc計算
+		try{
+			ui->textBrowser->append(QString::fromStdString(calc(s).toString()));
+		}
+		catch(const char* e){
+			ui->textBrowser->append(e);
+		}
 
 		//之後判斷是何種func
 //		for(int i=0;i<s.size();i++){
@@ -117,16 +144,6 @@ void MainWindow::on_pushButton_clicked()
 	else if(arg0=="指令B")
 		ui->textBrowser->append(inputStr+'\n');
 
-
-//	try{
-//		Vec v,v2(1);
-//		v.setData(1,1);
-//		v=v+v2;
-//		ui->textBrowser->insertPlainText(QString::fromStdString(v.toString()));
-//	}
-//	catch(const char* e){
-//		ui->textBrowser->insertPlainText(e);
-//	}
 }
 
 void MainWindow::on_actionOpen_triggered()//Qt讀檔方式
