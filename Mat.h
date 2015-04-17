@@ -21,6 +21,9 @@ public:
 	Mat operator+(const Mat& m);
 	Mat operator-(const Mat& m);
 	Mat operator*(const Mat& m);
+	Mat operator*(const double c);
+	//第1參數非Vec,不能是memberFunc,有其它memberFunc用到,so要宣告,不加friend會當作memberFunc
+	friend Mat operator*(const double c,const Mat& m);
 	Mat operator=(const Mat& m);
 	//cout<< 可能用不到
 	//friend ostream& operator<<(ostream&,const Mat&);
@@ -39,6 +42,9 @@ public:
 	Mat trans();
 	double cofactor(int r,int c);
 	double det();
+	Mat Adj();
+	Mat Inverse();
+	Mat L();
 ////////// ////////// ////////// //////////
 	std::string toString();
 };

@@ -238,7 +238,11 @@ void MainWindow::on_pushButton_8_clicked()
 void MainWindow::on_pushButton_9_clicked()
 {
 	//test
-	ui->textBrowser->append(QString::number(m[2].det()));
+	ui->textBrowser->append(QString::number(m[0].det()));
+	/*ui->textBrowser->append(QString::number(m[2].det())+"\n"
+			+QString::fromStdString( m[2].Inverse().toString() )+"\n"
+			+QString::fromStdString( (m[2].Inverse()*m[2]).toString() )+"\n"
+			+QString::fromStdString( (m[2]*m[2].Inverse()).toString() ) );*/
 }
 
 void MainWindow::on_pushButton_10_clicked()
