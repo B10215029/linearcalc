@@ -14,7 +14,8 @@ public:
 	Mat();
 	Mat(int r,int c);
 	Mat(double** d,int r,int c);
-	Mat(Vec* v,int r,int c);
+	Mat(Vec *v, int r, int c);
+	Mat(Vec& v);
 	Mat(const Mat& m);
 	~Mat();
 ////////// ////////// ////////// //////////
@@ -24,6 +25,7 @@ public:
 	Mat operator*(const double c);
 	//第1參數非Vec,不能是memberFunc,有其它memberFunc用到,so要宣告,不加friend會當作memberFunc
 	friend Mat operator*(const double c,const Mat& m);
+	Mat operator/(const double c);
 	Mat operator=(const Mat& m);
 	//cout<< 可能用不到
 	//friend ostream& operator<<(ostream&,const Mat&);

@@ -22,6 +22,8 @@ class MainWindow : public QMainWindow
 public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
+	QString toPostfix(QString &inputStr);
+	Mat calc(QString &inputStr);
 
 private slots:
 	void on_pushButton_clicked();
@@ -53,6 +55,8 @@ private slots:
 	void on_pushButton_9_clicked();
 
 	void on_pushButton_10_clicked();
+
+	void on_actionSave_triggered();
 
 private:
 	Ui::MainWindow *ui;

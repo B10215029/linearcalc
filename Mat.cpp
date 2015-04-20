@@ -37,6 +37,11 @@ Mat::Mat(Vec* v,int r,int c){
 		for(int j=0;j<c;j++)
 			data[i][j]=v[i].getData(j);
 }
+Mat::Mat(Vec& v){
+	initData(1,v.getDim());
+	for(int i=0;i<v.getDim();i++)
+		data[0][i]=v.getData(i);
+}
 Mat::Mat(const Mat& m){
 	initData(m.row,m.col);
 	for(int i=0;i<row;i++)
@@ -65,28 +70,34 @@ Mat Mat::operator-(const Mat& m){//operator override -
 }
 Mat Mat::operator*(const Mat& m){//operator override *
 	if(col!=m.row) throw "*失敗，維度不同!";
-	Mat re(row,col);
+	Mat re(row,m.col);
 	for(int i=0;i<row;i++)
 		for(int j=0;j<m.col;j++)
 			for(int k=0;k<col;k++)
 				re.data[i][j]+=data[i][k]*m.data[k][j];
 	return re;
 }
-Mat operator*(const double c,const Mat& m){
+Mat operator*(const double c,const Mat& m){//operator override *
 	Mat re(m.row,m.col);
 	for(int i=0;i<m.row;i++)
 		for(int j=0;j<m.col;j++)
 			re.data[i][j]=m.data[i][j]*c;
 	return re;
 }
-Mat Mat::operator*(const double c){
+Mat Mat::operator*(const double c){//operator override *
 	Mat re(row,col);
 	for(int i=0;i<row;i++)
 		for(int j=0;j<col;j++)
 			re.data[i][j]=data[i][j]*c;
 	return re;
 }
-
+Mat Mat::operator/(const double c){//operator override /
+	Mat re(row,col);
+	for(int i=0;i<row;i++)
+		for(int j=0;j<col;j++)
+			re.data[i][j]=data[i][j]/c;
+	return re;
+}
 Mat Mat::operator=(const Mat& m){//operator override =
 	deleteData();
 	initData(m.row,m.col);
@@ -159,9 +170,9 @@ int Mat::Rank(){//so hard...
 	return row;
 }
 Mat Mat::trans(){
-	Mat m(row,col);
-	for(int i=0;i<row;i++)
-		for(int j=0;j<col;j++)
+	Mat m(col,row);
+	for(int i=0;i<m.row;i++)
+		for(int j=0;j<m.col;j++)
 			m.data[i][j]=data[j][i];
 	return m;
 }
