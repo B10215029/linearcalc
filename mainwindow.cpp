@@ -201,6 +201,18 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(QString("new M%1").arg((char)(96+m.size())));
 		}
 	}
+	else if(args[0]=="info"){//顯示矩陣的資訊(行數列數)
+		try{
+			//Mat m = calc(toPostfix(args[1]));會出錯(QString不能轉QString&):(
+			QString s = toPostfix(args[1]);
+			Mat m = calc(s);
+			ui->textBrowser->append(QString("%1 row:%2 col:%3").arg(args[1]).arg(m.getRow()).arg(m.getCol()));
+		}
+		catch(const char* e){
+			ui->textBrowser->append(e);
+		}
+	}
+
 	else if(args[0]=="指令B")
 		ui->textBrowser->append(inputStr+'\n');
 	else
