@@ -1,6 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+class MatXChar{
+public:
+	char c;
+	Mat m;
+};
+
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
@@ -25,11 +31,10 @@ QString MainWindow::toPostfix(QString &inputStr){
 	operatorPriority["/"] = 3;
 
 	for(int i=0;i<inputStr.size();++i){
-		if(inputStr[i].isDigit())//0~9
+		if(inputStr[i].isDigit() || inputStr[i]=='.') //number  //QRegExp("\\-*[1-9]+\\.*\\d*")
 			outputStr += inputStr[i];
-		else if(inputStr[i].isLetter())//A~Z or a~z
-			outputStr += inputStr[i].toUpper();
-
+		else if(inputStr[i].isLetter()) //letter  //QRegExp("V[A-Z]|M[A-Z]")
+			outputStr += inputStr[i];
 		else if(inputStr[i] == '(')
 			operatorStack.push(inputStr[i]);
 		else if(inputStr[i] == ')'){
@@ -42,8 +47,7 @@ QString MainWindow::toPostfix(QString &inputStr){
 				  operatorPriority.value(QString(operatorStack.top())) >=
 				  operatorPriority.value(QString(inputStr[i]))) //裡面的東西比較大的話
 				outputStr += operatorStack.pop(); //就把他丟出來
-
-			operatorStack.push(inputStr[i]);
+			operatorStack.push(inputStr[i]);  //最後再把自己丟進去
 		}
 	}
 
@@ -53,54 +57,112 @@ QString MainWindow::toPostfix(QString &inputStr){
 }
 //只計算+*-/等operator
 //不管是向量還是矩陣都用矩陣回傳
-Mat MainWindow::calc(QString& inputStr){
-	QStack<Mat> stack;//Mat不管向量還是矩陣都能裝
-	for(int i=0;i<inputStr.length();++i){
-		if(inputStr[i]=='V')
+Mat MainWindow::calc(QString &inputStr){
+	QStack<MatXChar> stack;//Mat不管向量還是矩陣都能裝，MatXChar的c用來分辨是向量、矩陣還是常數
+	for(int i=0;i<inputStr.size();++i){
+		if(inputStr[i]=='V'){
 			//這樣的寫法只能讀26個值
 			//toLatin1可以把QChar轉成char
 			//Latin-1編碼前127字類似Ascii
-			stack.push(Mat(v[inputStr[++i].toLatin1()-65]));
-		else if(inputStr[i]=='M')
-			stack.push(m[inputStr[++i].toLatin1()-65]);
-		//這個常數只能在要乘的東西後面
+			MatXChar mxc;
+			mxc.m=Mat(v[inputStr[++i].toLatin1()-65]);
+			mxc.c='V';
+			stack.push(mxc);
+		}
+		else if(inputStr[i]=='M'){
+			MatXChar mxc;
+			int a=inputStr[++i].toLatin1()-65;
+			mxc.m=m[a];
+			mxc.c='M';
+			stack.push(mxc);
+		}
 		else if(inputStr[i].isDigit()){
 			int num = inputStr[i].toLatin1()-48;
 			while(inputStr[i+1].isDigit())
 				num = num*10+inputStr[++i].toLatin1()-48;
-			stack.push(Mat::identity(stack.top().getCol())*num);//依照他前面一個矩陣的大小來決定這個的大小
+			if(inputStr[i+1]=='.'){  //小數部分
+				int pointNum=(inputStr[++i].toLatin1()-48)/10;
+				while(inputStr[i+1].isDigit())
+					pointNum = pointNum/10+inputStr[++i].toLatin1()-48;
+				num+=pointNum;
+			}
+			MatXChar mxc;
+			mxc.m=Mat::identity(1)*num;
+			mxc.c='C';
+			stack.push(mxc);
 		}
-		else if(inputStr[i]=='+')
-			stack.push(stack.pop()+stack.pop());
-		else if(inputStr[i]=='-')
-			stack.push(stack.pop()-stack.pop());
+
+		else if(inputStr[i]=='+'){
+			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
+			if(mxc1.c!=mxc2.c) throw "Input Error!";
+			result.m=mxc1.m+mxc2.m;
+			result.c=mxc1.c;
+			stack.push(result);
+		}
+		else if(inputStr[i]=='-'){
+			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
+			if(mxc1.c!=mxc2.c) throw "Input Error!";
+			result.m=mxc1.m-mxc2.m;
+			result.c=mxc1.c;
+			stack.push(result);
+		}
+
 		else if(inputStr[i]=='*'){
-			Mat m1=stack.pop();
-			Mat m2=stack.pop();
-			if(m1.getRow()==1&&m1.getCol()==m2.getCol())//依情況把m1轉置
-				stack.push(m2*m1.trans());
-			else
-				stack.push(m2*m1);
+			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
+			if(mxc1.c!=mxc2.c){  //c不相同
+				if(mxc1.c=='C'){
+					result.m = mxc2.m * mxc1.m.getRowData(0).getData(0);
+					result.c = mxc2.c;
+				}
+				else if(mxc2.c=='C'){
+					result.m =  mxc2.m.getRowData(0).getData(0) * mxc1.m;
+					result.c = mxc1.c;
+				}
+				else
+					throw "Input Error!";
+			}
+			else{  //c都相同
+				if(mxc1.c=='V'){
+					result.m =  mxc2.m.trans() * mxc1.m;
+					result.c = 'C';
+				}
+				else if(mxc1.c=='M'){
+					result.m = mxc2.m * mxc1.m;
+					result.c = 'M';
+				}
+				else if(mxc1.c=='C'){
+					result.m = mxc2.m * mxc1.m;
+					result.c = 'C';
+				}
+			}
+			stack.push(result);
 		}
-//		else if(inputStr[i]=='/'){
-//			Mat m=stack.pop();
-//			stack.push(stack.pop()/m);
-//		}
+
+		else if(inputStr[i]=='/'){
+			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
+			if(mxc1.c=='C'){
+				result.m = mxc2.m / mxc1.m.getRowData(0).getData(0);
+				result.c = mxc2.c;
+			}
+			else throw "Input Error!";
+			stack.push(result);
+		}
 	}
-	return stack.pop();
+	return stack.pop().m;
 }
 
 void MainWindow::on_pushButton_clicked()
 {
-	QString inputStr= ui->lineEdit->text(), arg0, arg1;
+	QString inputStr= ui->lineEdit->text(),s;
 	QStringList args= inputStr.split(' ');
 
-	arg0 = args[0] = args[0].toLower();
-	for(int i=1;i<args.size();i++)
-		arg1+=args[i];
+	args[0] = args[0].toLower();
+	for(int i=1;i<args.size();++i)
+		s+=args[i];
+	s=s.toUpper();
 
 	if(args[0]=="print"){
-		QString s=toPostfix(arg1);
+		s=toPostfix(s);
 		ui->textBrowser->append(s+'\n');
 		try{
 			ui->textBrowser->append(QString::fromStdString(calc(s).toString()));
@@ -114,10 +176,11 @@ void MainWindow::on_pushButton_clicked()
 	else if(args[0]=="new"){//手動新增變數(格式如輸入檔案)(沒有輸入錯誤的判斷)
 		if(args[1].toUpper()=="V"){
 			Vec vv(args[2].toInt());
-			for(int r=0;r<vv.getDim();r++)
-				vv.setData(args[3+r].toDouble(),r);
+			for(int i=0;i<vv.getDim();i++)
+				vv.setData(args[3+i].toDouble(),i);
 			v.push_back(vv);
 			ui->comboBox->addItem(QString("V%1").arg((char)(96+v.size())));
+			ui->textBrowser->append(QString("new V%1").arg((char)(96+v.size())));
 		}
 		else if(args[1].toUpper()=="M"){
 			Mat mm(args[2].toInt(),args[3].toInt());
@@ -127,6 +190,7 @@ void MainWindow::on_pushButton_clicked()
 					mm.setData(args[4+k++].toDouble(),r,c);
 			m.push_back(mm);
 			ui->comboBox_2->addItem(QString("M%1").arg((char)(96+m.size())));
+			ui->textBrowser->append(QString("new M%1").arg((char)(96+m.size())));
 		}
 	}
 	else if(args[0]=="info"){//顯示矩陣的資訊(行數列數)
@@ -141,12 +205,17 @@ void MainWindow::on_pushButton_clicked()
 		}
 	}
 
+	else if(args[0]=="指令B")
+		ui->textBrowser->append(inputStr+'\n');
+	else
+		ui->textBrowser->append("No such instructions!");
 }
 
 void MainWindow::on_actionOpen_triggered()//Qt讀檔方式
 {
-	//Open Dialog and Return file Directory
-	QStringList fnames=QFileDialog::getOpenFileNames(this,"Open File" , "../" , "Text(*.txt);;All(*)");
+	//Open Dialog and Return files Directory
+	QStringList fnames=QFileDialog::getOpenFileNames(this,"Open Files" ,
+													 "../" , "Text(*.txt);;All(*)");
 
 	for(int ni=0;ni<fnames.size();ni++){
 		QFile f(fnames[ni]);
@@ -265,6 +334,10 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 {
 	//test
 	ui->textBrowser->append(QString::number(m[2].det()));
+	/*ui->textBrowser->append(QString::number(m[2].det())+"\n"
+			+QString::fromStdString( m[2].Inverse().toString() )+"\n"
+			+QString::fromStdString( (m[2].Inverse()*m[2]).toString() )+"\n"
+			+QString::fromStdString( (m[2]*m[2].Inverse()).toString() ) );*/
 }
 
 void MainWindow::on_pushButton_10_clicked()//未定義

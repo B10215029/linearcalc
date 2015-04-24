@@ -77,11 +77,25 @@ Mat Mat::operator*(const Mat& m){//operator override *
 				re.data[i][j]+=data[i][k]*m.data[k][j];
 	return re;
 }
+Mat operator*(const double c,const Mat& m){//operator override *
+	Mat re(m.row,m.col);
+	for(int i=0;i<m.row;i++)
+		for(int j=0;j<m.col;j++)
+			re.data[i][j]=m.data[i][j]*c;
+	return re;
+}
 Mat Mat::operator*(const double c){//operator override *
 	Mat re(row,col);
 	for(int i=0;i<row;i++)
 		for(int j=0;j<col;j++)
 			re.data[i][j]=data[i][j]*c;
+	return re;
+}
+Mat Mat::operator/(const double c){//operator override /
+	Mat re(row,col);
+	for(int i=0;i<row;i++)
+		for(int j=0;j<col;j++)
+			re.data[i][j]=data[i][j]/c;
 	return re;
 }
 Mat Mat::operator=(const Mat& m){//operator override =
@@ -110,14 +124,14 @@ void Mat::setI(){//----1
 		for(int j=0;j<col;j++)
 			data[i][j]=1.;
 }
-void Mat::setData(double** d,int r,int c){
+void Mat::setData(double** d,int r,int c){//屬重新設定，不判斷範圍
 	deleteData();
 	initData(r,c);
 	for(int i=0;i<r;i++)
 		for(int j=0;j<c;j++)
 			data[i][j]=d[i][j];
 }
-void Mat::setData(Vec* v,int r,int c){
+void Mat::setData(Vec* v,int r,int c){//屬重新設定，不判斷範圍
 	deleteData();
 	initData(r,c);
 	for(int i=0;i<r;i++)
@@ -197,6 +211,25 @@ double Mat::det(){
 	for(int i=0;i<col;i++)
 		x+=data[0][i]*pow(-1,0+i)*minor_mat(0,i).det();
 	return x;
+}
+Mat Mat::Adj(){
+	Mat m(row,col);
+	for(int i=0;i<row;i++)
+		for(int j=0;j<col;j++)
+			m.setData(cofactor(i,j),j,i);
+	return m;
+}
+Mat Mat::Inverse(){
+	double x=det();
+	if(x==0) throw "沒有反矩陣";
+	return 1/x*Adj();
+}
+Mat Mat::L(){
+	Mat m;
+	for(int i=0;i<row;i++){
+		//
+	}
+	return m;
 }
 std::string Mat::toString(){
 	std::ostringstream out;
