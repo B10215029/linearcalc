@@ -2,14 +2,13 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QVector>
 #include <QStack>
 #include <QMap>
 #include <QFileDialog>
 #include <QTextStream>
 #include <Vec.h>
 #include <Mat.h>
-#include <iostream> //debug用
+//#include <iostream> //debug用
 
 namespace Ui {
 class MainWindow;

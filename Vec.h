@@ -24,8 +24,6 @@ public:
 	bool operator==(Vec& v);
 	bool operator!=(Vec& v);
 	Vec operator=(const Vec& v);
-	//cout<< 可能用不到
-	//friend ostream& operator<<(ostream&,const Vec&);
 ////////// ////////// ////////// //////////
 	void setO();
 	void setI();
@@ -39,17 +37,17 @@ public:
 	Vec normal();
 	void normalize();
 	double dot(const Vec& v);
-	bool isOrtho(const Vec& v);
 	double angle_cos(Vec& v);
 	double angle_radian(Vec& v);
 	double angle_degree(Vec& v);
 	double comp(Vec& v);
 	Vec proj(Vec& v);
+	double Area(Vec& v);
 	Vec cross3(const Vec& v);
 	double cross3_norm(const Vec& v);
-	bool isParallel(const Vec& v);
-	bool isOrthogonal(const Vec& v);
-	bool IsLI(const Vec& v);
+	bool isParal(Vec &v);
+	bool isOrtho(const Vec& v);
+	Vec planeNormal(Vec& v);
 ////////// ////////// ////////// //////////
 	std::string toString();
 };

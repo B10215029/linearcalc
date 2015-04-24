@@ -118,6 +118,14 @@ Mat MainWindow::calc(QString &inputStr){
 					result.m =  mxc2.m.getRowData(0).getData(0) * mxc1.m;
 					result.c = mxc1.c;
 				}
+				else if(mxc1.c=='V'){
+					result.m =  mxc2.m * mxc1.m.trans();
+					result.c = 'M';
+				}
+				else if(mxc2.c=='V'){
+					result.m =  mxc2.m * mxc1.m;
+					result.c = 'M';
+				}
 				else
 					throw "Input Error!";
 			}
@@ -321,11 +329,38 @@ void MainWindow::on_pushButton_8_clicked()//清除輸入
 void MainWindow::on_pushButton_9_clicked()//未定義
 {
 	//test
-	ui->textBrowser->append(QString::number(m[2].det()));
-	/*ui->textBrowser->append(QString::number(m[2].det())+"\n"
-			+QString::fromStdString( m[2].Inverse().toString() )+"\n"
-			+QString::fromStdString( (m[2].Inverse()*m[2]).toString() )+"\n"
-			+QString::fromStdString( (m[2]*m[2].Inverse()).toString() ) );*/
+	try{
+		Mat l,u;
+		int swapCount;
+		m[0].LU(l,u,swapCount);
+		ui->textBrowser->append(QString::fromStdString((l*u).toString())+"\n");
+		ui->textBrowser->append(QString::fromStdString(l.toString())+"\n");
+		ui->textBrowser->append(QString::fromStdString(u.toString())+"\n");
+
+		ui->textBrowser->append(QString::number(m[0].det())+"\n");
+		ui->textBrowser->append(QString::number(l.det())+"\n");
+		ui->textBrowser->append(QString::number(u.det())+"\n");
+
+		ui->textBrowser->append(QString::fromStdString(m[0].Inverse().toString())+"\n");
+
+		ui->textBrowser->append(QString::fromStdString((l*u-m[0]).toString())+"\n");
+
+		ui->textBrowser->append(QString::fromStdString((m[0]*m[0].Inverse()).toString())+"\n");
+		ui->textBrowser->append(QString::fromStdString((m[0].Inverse()*m[0]).toString())+"\n");
+
+//		Mat t;
+//		ui->textBrowser->append(QString::number(m[2].Rank(t))+"\n");
+//		ui->textBrowser->append(QString::fromStdString(t.toString())+"\n");
+
+//		ui->textBrowser->append(QString::number(v[0].dot(v[1]))+"\n");
+//		ui->textBrowser->append(QString::number(v[2].dot(v[3]))+"\n");
+//		ui->textBrowser->append(QString::number(v[4].dot(v[5]))+"\n");
+
+		//ui->textBrowser->append(QString::number(v[6].isOrtho(v[7]))+"\n");
+	}
+	catch(const char* e){
+		ui->textBrowser->append(e);
+	}
 }
 
 void MainWindow::on_pushButton_10_clicked()//未定義
@@ -339,7 +374,7 @@ void MainWindow::on_pushButton_10_clicked()//未定義
 //	ui->textBrowser->append(ostr);
 	Mat a(10,2);
 	Mat b=a.trans();
-	b.setI();
+	//b.setI();
 	b.setData(b.getRow(),0,0);
 	Vec va(10);
 	va.setI();
