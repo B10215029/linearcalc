@@ -12,7 +12,7 @@ Vec::Vec(){
 Vec::Vec(int s):dim(s){
 	data=new double[s];
 	for(int i=0;i<s;i++)
-		data[i]=0.;
+		data[i]=0;
 }
 Vec::Vec(double* d,int s):dim(s){
 	data=new double[s];
@@ -57,7 +57,7 @@ Vec operator*(const double c,const Vec& v1){//----Scalar multiplication
 	return v;
 }
 Vec Vec::operator/(const double c){//----Scalar division
-	if(c==0.) throw "不可除以0";
+	if(c==0) throw "不可除以0";
 	Vec v(dim);
 	for(int i=0;i<dim;i++)
 		v.data[i]=data[i]/c;
@@ -77,19 +77,10 @@ Vec Vec::operator=(const Vec& v){//----Asign
 		data[i]=v.data[i];
 	return *this;
 }
-//ostream& operator<<(ostream& out,const Vec& v){//----output <<
-//	for(int i=0;i<v.dim;++i){
-//		if(i==0) out<<"(";
-//		if(i!=v.dim-1) out<<v.data[i]<<",";
-//		else out<<v.data[i]<<")";
-//	}
-//	return out;
-//}
-//friend ostream& operator<<(ostream&,const Vec&);//加friend才能存取protected
 ////////// ////////// ////////// //////////
 void Vec::setO(){//----0
 	for(int i=0;i<dim;i++)
-		data[i]=0.;
+		data[i]=0;
 }
 void Vec::setI(){//----1
 	for(int i=0;i<dim;i++)
@@ -122,7 +113,7 @@ bool Vec::isEqual(const Vec& v){//----Equality
 }
 double Vec::distance(const Vec& v){//----Distance Between Two Vectors
 	if(dim!=v.dim) throw "distance失敗，維度不同!";
-	double d=0.;
+	double d=0;
 	for(int i=0;i<dim;i++)
 		d+=pow(data[i]-v.data[i],2);
 	return sqrt(d);
@@ -145,14 +136,10 @@ void Vec::normalize(){//----normalize
 }
 double Vec::dot(const Vec& v){//----Dot Product
 	if(dim!=v.dim) throw "dot失敗，維度不同!";
-	double d=0.;
+	double d=0;
 	for(int i=0;i<dim;i++)
 		d+=data[i]*v.data[i];
 	return d;
-}
-bool Vec::isOrtho(const Vec& v){//----Orthogonal
-	if(dim!=v.dim) throw "isOrtho失敗，維度不同!";
-	return dot(v)==0.;
 }
 double Vec::angle_cos(const Vec& v){//----angle between
 	if(dim!=v.dim) throw "angle_cos失敗，維度不同!";
@@ -175,28 +162,30 @@ Vec Vec::proj(Vec& v){//----Projection
 	Vec re=comp(v)*v.normal();
 	return re;
 }
+double Vec::Area(Vec& v){
+	return cross3_norm(v)/2;
+}
+
 Vec Vec::cross3(const Vec& v){
 	if(dim!=3||v.dim!=3) throw "cross3失敗，維度不是3!";
 	Vec re(3);
 	re.data[0]=data[1]*v.data[2]-data[2]*v.data[1];
-	re.data[1]=data[0]*v.data[2]-data[2]*v.data[0];
+	re.data[1]=-data[0]*v.data[2]+data[2]*v.data[0];
 	re.data[2]=data[0]*v.data[1]-data[1]*v.data[0];
 	return re;
 }
 double Vec::cross3_norm(const Vec& v){
 	return cross3(v).norm();
 }
-bool Vec::isParallel(const Vec& v){
+bool Vec::isParal(Vec& v){
+	if(dim!=v.dim) throw "isParal失敗，維度不同!";
 	return (angle_cos(v)==1||angle_cos(v)==-1);
 }
-bool Vec::isOrthogonal(const Vec& v){
+bool Vec::isOrtho(const Vec& v){//----Orthogonal
+	if(dim!=v.dim) throw "isOrtho失敗，維度不同!";
 	return dot(v)==0;
 }
-bool Vec::IsLI(const Vec& v){
-	return isOrthogonal(v);
-}
-Vec Vec::pN(const Vec& v){
-	//return cross3(v).normal();
+Vec Vec::planeNormal(Vec& v){
 	return cross3(v);
 }
 //std::string Vec::toString(){
