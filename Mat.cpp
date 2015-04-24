@@ -397,7 +397,7 @@ void Mat::LU(Mat& l,Mat& u,int& swapCount){
 bool Mat::IsLI(){
 	if(row>col)
 		return false;
-	//if(Rank()==row)
+	//if(Rank()==row)//rank目前有問題
 	Mat a=trans(),b(a.col,1);
 	Mat x=a.SolveSquareLinearSys(b),zero(a.row,1);
 	if(x==zero)
