@@ -342,22 +342,14 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 
 void MainWindow::on_pushButton_10_clicked()//未定義
 {
-	//我只是拿來測試一下東西
-//	QString ostr;
-//	for(int i=0;i<v.size();i++)
-//		ostr+=QString::fromStdString(v[i].toString())+"\n";
-//	for(int i=0;i<m.size();i++)
-//		ostr+=QString::fromStdString(m[i].toString())+"\n";
-//	ui->textBrowser->append(ostr);
-	Mat a(10,2);
-	Mat b=a.trans();
-	b.setI();
-	b.setData(b.getRow(),0,0);
-	Vec va(10);
-	va.setI();
-	b=b*Mat(va).trans();
-	//ui->textBrowser->append(QString::fromStdString(a.toString()));
-	ui->textBrowser->append(QString::fromStdString(b.toString()));
+	Vec a,b,c;
+	a.setData(62.944737,0);
+	a.setData(81.158387,1);
+	a.setData(-74.602637,2);
+	b.setData(82.675171,0);
+	b.setData(26.471849,1);
+	b.setData(-80.491919,2);
+	ui->textBrowser->append(QString::fromStdString(a.pN(b).toString()));
 }
 
 void MainWindow::on_actionSave_triggered()
