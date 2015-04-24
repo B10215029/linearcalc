@@ -33,13 +33,13 @@ public:
 	int getDim();
 	bool isEqual(const Vec& v);
 	double distance(const Vec& v);
-	double norm();
+	double norm()const;
 	Vec normal();
 	void normalize();
 	double dot(const Vec& v);
-	double angle_cos(Vec& v);
-	double angle_radian(Vec& v);
-	double angle_degree(Vec& v);
+	double angle_cos(const Vec &v);
+	double angle_radian(const Vec &v);
+	double angle_degree(const Vec &v);
 	double comp(Vec& v);
 	Vec proj(Vec& v);
 	double Area(Vec& v);

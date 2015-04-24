@@ -118,8 +118,8 @@ double Vec::distance(const Vec& v){//----Distance Between Two Vectors
 		d+=pow(data[i]-v.data[i],2);
 	return sqrt(d);
 }
-double Vec::norm(){//----norm,magnitude,length
-	double d=0;
+double Vec::norm()const{//----norm,magnitude,length
+	double d=0.;
 	for(int i=0;i<dim;i++)
 		d+=pow(data[i],2);
 	return sqrt(d);
@@ -141,15 +141,15 @@ double Vec::dot(const Vec& v){//----Dot Product
 		d+=data[i]*v.data[i];
 	return d;
 }
-double Vec::angle_cos(Vec& v){//----angle between
+double Vec::angle_cos(const Vec& v){//----angle between
 	if(dim!=v.dim) throw "angle_cos失敗，維度不同!";
 	return dot(v)/norm()/v.norm();
 }
-double Vec::angle_radian(Vec& v){//----angle between
+double Vec::angle_radian(const Vec& v){//----angle between
 	if(dim!=v.dim) throw "angle_radian失敗，維度不同!";
 	return acos(dot(v)/norm()/v.norm());
 }
-double Vec::angle_degree(Vec& v){//----angle between
+double Vec::angle_degree(const Vec& v){//----angle between
 	if(dim!=v.dim) throw "angle_degree失敗，維度不同!";
 	return acos(dot(v)/norm()/v.norm())*(180/M_PI);
 }
@@ -159,7 +159,7 @@ double Vec::comp(Vec& v){//----Component
 }
 Vec Vec::proj(Vec& v){//----Projection
 	if(dim!=v.dim) throw "proj失敗，維度不同!";
-	Vec re=comp(v)*(v/v.norm());
+	Vec re=comp(v)*v.normal();
 	return re;
 }
 double Vec::Area(Vec& v){
@@ -179,8 +179,7 @@ double Vec::cross3_norm(const Vec& v){
 }
 bool Vec::isParal(Vec& v){
 	if(dim!=v.dim) throw "isParal失敗，維度不同!";
-	if(angle_cos(v)==1 || angle_cos(v)==-1) return true;
-	return false;
+	return (angle_cos(v)==1||angle_cos(v)==-1);
 }
 bool Vec::isOrtho(const Vec& v){//----Orthogonal
 	if(dim!=v.dim) throw "isOrtho失敗，維度不同!";
@@ -189,15 +188,22 @@ bool Vec::isOrtho(const Vec& v){//----Orthogonal
 Vec Vec::planeNormal(Vec& v){
 	return cross3(v);
 }
+//std::string Vec::toString(){
+//	std::ostringstream out;
+//	for(int i=0;i<dim;++i){
+//		if(i==0)
+//			out<<"(";
+//		if(i!=dim-1)
+//			out<<data[i]<<", ";
+//		else
+//			out<<data[i]<<")";
+//	}
+//	return out.str();
+//}
 std::string Vec::toString(){
 	std::ostringstream out;
 	for(int i=0;i<dim;++i){
-		if(i==0)
-			out<<"(";
-		if(i!=dim-1)
-			out<<data[i]<<", ";
-		else
-			out<<data[i]<<")";
+		out<<data[i]<<" ";
 	}
 	return out.str();
 }

@@ -8,11 +8,11 @@ V	Cross	外積
 V	Com	投影向量的長度	
 V	Proj	投影向量	
 	Area	Triangle area	
-	isPara	是否平行	
-	isOrth	是否垂直	
-	Angle	The angle between two vectors 	
-	pN	Plane normal	
-	IsLI	Linear independent judgement	
+V	isPara	是否平行	
+V	isOrth	是否垂直	
+V	Angle	The angle between two vectors 	
+V	pN	Plane normal	
+V	IsLI	Linear independent judgement	
 	Ob	Find orthonormal basis of the basis	
 矩陣			
 	+	加法	
