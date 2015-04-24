@@ -49,6 +49,7 @@ public:
 	void LU(Mat& p,Mat& l,Mat& u);
 	void LU(Mat& l,Mat& u,int& swapCount);//type1 row reduction
 	bool IsLI();
+	Mat SolveSquareLinearSys(Vec& b);
 ////////// ////////// ////////// //////////
 	std::string toString();
 };

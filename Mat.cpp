@@ -421,56 +421,15 @@ bool Mat::IsLI(){
 		return true;
 	return false;
 }
-Mat Mat::SolveLinearSys(Vec& b){
-	if(col!=b.dim) throw "SolveLinearSys失敗，維度不同!";
-	Mat x(row,1);
-	Mat u(*this),p=Mat::identity(row);
-	for(int i=0;i<row;i++) //find nearest row not 0 element
-		if(u.data[i][i]==0)
-			for(int j=i+1;j<row;j++)
-				if(u.data[j][i]!=0){
-					u.swapRow(i,j);
-					p.swapRow(i,j);
-					break;
-				}
-	for(int i=0;i<row;i++) //從上往下消其他row
-		for(int j=i+1;j<row;j++){
-			if(u.data[i][i]==0) break;
-			double muti=u.data[j][i]/u.data[i][i];
-			u.data[j][i]=0;
-			for(int k=i+1;k<col;k++)
-				u.data[j][k]-=muti*u.data[i][k];
-			for(int k=0;k<col;k++)
-				p.data[j][k]-=muti*p.data[i][k];
-		}
-	for(int i=row-1;i>=0;i--) //從下往上消其他row
-		for(int j=i-1;j>=0;j--){
-			if(u.data[i][i]==0) break;
-			double muti=u.data[j][i]/u.data[i][i];
-			u.data[j][i]=0;
-			for(int k=i-1;k>=0;k--)
-				u.data[j][k]-=muti*u.data[i][k];
-			for(int k=row-1;k>=0;k--)
-				p.data[j][k]-=muti*p.data[i][k];
-		}
-	for(int i=0;i<row;i++) //變1
-		if(u.data[i][i]!=0){
-			double div=u.data[i][i];
-			for(int j=0;j<col;j++){
-				u.data[i][j]/=div;
-				p.data[i][j]/=div;
-			}
-		}
-	int rank=u.row;
-	for(int i=0;i<u.row;i++){
-		for(int j=0;j<u.col;j++){
-			if(fabs(u.data[i][j])>0.00002) break;
-			if(j==u.col-1) throw "無限多解!";
-		}
-	}
-	for(int i=row-1;i>=0;i++){
-		if(row)
-	}
+Mat Mat::SolveSquareLinearSys(Vec& b){
+	if(row!=col || row!=b.getDim()) throw "SolveSquareLinearSys失敗，維度不同!";
+	Mat l,u;
+	int s;
+	LU(l,u,s);
+
+//	ax=b=lux=ly;
+//	ux=y;
+//	ly=b;
 }
 std::string Mat::toString(){
 	std::ostringstream out;
