@@ -1,12 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-class MatXChar{
-public:
-	char c;
-	Mat m;
-};
-
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
@@ -61,18 +55,22 @@ Mat MainWindow::calc(QString &inputStr){
 	QStack<MatXChar> stack;//Mat不管向量還是矩陣都能裝，MatXChar的c用來分辨是向量、矩陣還是常數
 	for(int i=0;i<inputStr.size();++i){
 		if(inputStr[i]=='V'){
-			//這樣的寫法只能讀26個值
 			//toLatin1可以把QChar轉成char
 			//Latin-1編碼前127字類似Ascii
 			MatXChar mxc;
-			mxc.m=Mat(v[inputStr[++i].toLatin1()-65]);
+			int indexOffset=-65;
+			while(inputStr[++i]=='Z')
+				indexOffset+=25;
+			mxc.m=Mat(v[inputStr[i].toLatin1()+indexOffset]);
 			mxc.c='V';
 			stack.push(mxc);
 		}
 		else if(inputStr[i]=='M'){
 			MatXChar mxc;
-			int a=inputStr[++i].toLatin1()-65;
-			mxc.m=m[a];
+			int indexOffset=-65;
+			while(inputStr[++i]=='Z')
+				indexOffset+=25;
+			mxc.m=Mat(m[inputStr[++i].toLatin1()+indexOffset]);
 			mxc.c='M';
 			stack.push(mxc);
 		}
@@ -163,60 +161,151 @@ void MainWindow::on_pushButton_clicked()
 {
 	QString inputStr= ui->lineEdit->text(),s;
 	QStringList args= inputStr.split(' ');
-
-	args[0] = args[0].toLower();
+	QString inst = args[0].toLower();
 	for(int i=1;i<args.size();++i)
 		s+=args[i];
 	s=s.toUpper();
+	args = s.split(',');
 
-	if(args[0]=="print"){
-		s=toPostfix(s);
-		ui->textBrowser->append(s+'\n');
-		try{
+	try{
+		/////通用指令/////
+		if(inst=="print"){
+			args[0]=toPostfix(args[0]);
+			ui->textBrowser->append(s);
 			ui->textBrowser->append(QString::fromStdString(calc(s).toString()));
 		}
-		catch(const char* e){
-			ui->textBrowser->append(e);
+		else if(inst=="info"){//顯示矩陣的資訊(行數列數)
+			args[0] = toPostfix(args[0]);
+			Mat m = calc(args[0]);
+			ui->textBrowser->append(QString("%1 Row:%2 Col:%3 First data:%4").arg(args[0]).arg(m.getRow()).arg(m.getCol()).arg(m.getRowData(0).getData(0)));
 		}
-	}
-	else if(args[0]=="cls")//清除輸出畫面
-		ui->textBrowser->setText("");
-	else if(args[0]=="new"){//手動新增變數(格式如輸入檔案)(沒有輸入錯誤的判斷)
-		if(args[1].toUpper()=="V"){
-			Vec vv(args[2].toInt());
-			for(int i=0;i<vv.getDim();i++)
-				vv.setData(args[3+i].toDouble(),i);
-			v.push_back(vv);
-			ui->comboBox->addItem(QString("V%1").arg((char)(96+v.size())));
-			ui->textBrowser->append(QString("new V%1").arg((char)(96+v.size())));
+		else if(inst=="new"){//手動新增變數(格式如輸入檔案)(沒有輸入錯誤的判斷)
+			args= inputStr.split(' ');//用空白隔開方便輸入
+			if(args[1].toUpper()=="V"){
+				Vec vv(args[2].toInt());
+				for(int i=0;i<vv.getDim();i++)
+					vv.setData(args[3+i].toDouble(),i);
+				v.push_back(vv);
+				//這行解釋在OpenFile
+				ui->comboBox->addItem(QString("V%1").arg(QString("Z").repeated((v.size()-1)/25)+(97+((v.size()-1)%25))));
+				ui->textBrowser->append(QString("new %1").arg(ui->comboBox->itemText(ui->comboBox->count()-1)));
+			}
+			else if(args[1].toUpper()=="M"){
+				Mat mm(args[2].toInt(),args[3].toInt());
+				int k=0;
+				for(int r=0;r<mm.getRow();r++)
+					for(int c=0;c<mm.getCol();c++)
+						mm.setData(args[4+k++].toDouble(),r,c);
+				m.push_back(mm);
+				ui->comboBox_2->addItem(QString("M%1").arg(QString("Z").repeated((v.size()-1)/25)+(97+((v.size()-1)%25))));
+				ui->textBrowser->append(QString("new %1").arg(ui->comboBox->itemText(ui->comboBox->count()-1)));
+			}
 		}
-		else if(args[1].toUpper()=="M"){
-			Mat mm(args[2].toInt(),args[3].toInt());
-			int k=0;
-			for(int r=0;r<mm.getRow();r++)
-				for(int c=0;c<mm.getCol();c++)
-					mm.setData(args[4+k++].toDouble(),r,c);
-			m.push_back(mm);
-			ui->comboBox_2->addItem(QString("M%1").arg((char)(96+m.size())));
-			ui->textBrowser->append(QString("new M%1").arg((char)(96+m.size())));
+		else if(inst=="cls"){//清除輸出畫面
+			ui->textBrowser->setText("");
 		}
-	}
-	else if(args[0]=="info"){//顯示矩陣的資訊(行數列數)
-		try{
-			//Mat m = calc(toPostfix(args[1]));會出錯(QString不能轉QString&):(
-			QString s = toPostfix(args[1]);
-			Mat m = calc(s);
-			ui->textBrowser->append(QString("%1 row:%2 col:%3").arg(args[1]).arg(m.getRow()).arg(m.getCol()));
+		/////向量指令/////
+		else if(inst=="norm"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			Vec v = calc(args[0]).getRowData(0);
+			ui->textBrowser->append(QString("%1").arg(v.norm()));
 		}
-		catch(const char* e){
-			ui->textBrowser->append(e);
+		else if(inst=="normal"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			Vec v = calc(args[0]).getRowData(0);
+			ui->textBrowser->append(QString::fromStdString(v.normal().toString()));
 		}
-	}
+		else if(inst=="cross"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			args[1] = toPostfix(args[1]);
+			Vec v1 = calc(args[0]).getRowData(0);
+			Vec v2 = calc(args[1]).getRowData(0);
+			ui->textBrowser->append(QString::fromStdString(v1.cross3(v2).toString()));
+		}
+		else if(inst=="com"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			args[1] = toPostfix(args[1]);
+			Vec v1 = calc(args[0]).getRowData(0);
+			Vec v2 = calc(args[1]).getRowData(0);
+			ui->textBrowser->append(QString("%1").arg(v1.comp(v2)));
+		}
+		else if(inst=="proj"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			args[1] = toPostfix(args[1]);
+			Vec v1 = calc(args[0]).getRowData(0);
+			Vec v2 = calc(args[1]).getRowData(0);
+			ui->textBrowser->append(QString::fromStdString(v1.proj(v2).toString()));
+		}
+		else if(inst=="area"){
+			ui->textBrowser->append("coming soon!");
+		}
+		else if(inst=="ispara"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			args[1] = toPostfix(args[1]);
+			Vec v1 = calc(args[0]).getRowData(0);
+			Vec v2 = calc(args[1]).getRowData(0);
+			ui->textBrowser->append(v1.isParal(v2)?"Yes":"No");
+		}
+		else if(inst=="isorth"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			args[1] = toPostfix(args[1]);
+			Vec v1 = calc(args[0]).getRowData(0);
+			Vec v2 = calc(args[1]).getRowData(0);
+			ui->textBrowser->append(v1.isOrtho(v2)?"Yes":"No");
+		}
+		else if(inst=="angle"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			args[1] = toPostfix(args[1]);
+			Vec v1 = calc(args[0]).getRowData(0);
+			Vec v2 = calc(args[1]).getRowData(0);
+			ui->textBrowser->append(QString("%1").arg(v1.angle_degree(v2)));
+		}
+		else if(inst=="pn"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			args[1] = toPostfix(args[1]);
+			Vec v1 = calc(args[0]).getRowData(0);
+			Vec v2 = calc(args[1]).getRowData(0);
+			ui->textBrowser->append(QString::fromStdString(v1.planeNormal(v2).toString()));
+		}
+		else if(inst=="isli"){
+			ui->textBrowser->append("coming soon!");
+		}
+		else if(inst=="ob"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			Vec vi = calc(args[0]).getRowData(0);
+			Vec *v=new Vec[vi.getDim()];
+			v[0]=vi;
+			for(int i=1;i<vi.getDim();i++){
+				args[0] = toPostfix(args[0]);
+				v[i]=calc(args[i]).getRowData(0);
+			}
+			Vec::ob(v);
+			for(int i=0;i<vi.getDim();i++){
+				ui->textBrowser->append(QString::fromStdString(v[i].toString()));
+			}
+		}
+		/////矩陣指令/////
 
-	else if(args[0]=="指令B")
-		ui->textBrowser->append(inputStr+'\n');
-	else
-		ui->textBrowser->append("No such instructions!");
+		/////其他/////
+		else
+			ui->textBrowser->append("No such instructions!");
+	}
+	catch(const char* e){
+		ui->textBrowser->append(e);
+	}
+	catch(...){
+		ui->textBrowser->append("Pardon?");
+	}
 }
 
 void MainWindow::on_actionOpen_triggered()//Qt讀檔方式
@@ -255,7 +344,10 @@ void MainWindow::on_actionOpen_triggered()//Qt讀檔方式
 				v.push_back(vv);
 
 				//加到下拉選單中
-				ui->comboBox->addItem(QString("V%1").arg((char)(96+v.size())));
+				//QString("Z").repeated(N)把Z重複N次
+				//(v.size()-1)/25 每25個加一次
+				//97+((v.size()-1)%25 96('a')加上v.size減1(a是0)餘25(a~y共25個)
+				ui->comboBox->addItem(QString("V%1").arg(QString("Z").repeated((v.size()-1)/25)+(97+((v.size()-1)%25))));
 			}
 			else if(dataType=="M"){
 				int col;
@@ -272,7 +364,7 @@ void MainWindow::on_actionOpen_triggered()//Qt讀檔方式
 				m.push_back(mm);
 
 				//加到下拉選單中
-				ui->comboBox_2->addItem(QString("M%1").arg((char)(96+m.size())));
+				ui->comboBox_2->addItem(QString("M%1").arg(QString("Z").repeated((v.size()-1)/25)+(97+((v.size()-1)%25))));
 			}
 		}
 		//Output to TextBrowser
@@ -389,11 +481,7 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 void MainWindow::on_pushButton_10_clicked()//未定義
 {
 	try{
-		Vec a[]={v[8],v[9],v[10],v[11],v[12],v[13],v[14],v[15],v[16],v[17],
-				v[18],v[19],v[20],v[21],v[22],v[23],v[24],v[25],v[26],v[27]};
-		Vec::ob(a);
-		for(int i=0;i<20;i++)
-			ui->textBrowser->append(QString::fromStdString(a[i].toString()));
+		ui->textBrowser->append(QString::fromStdString(a[i].toString()));
 	}
 	catch(const char* e){
 		ui->textBrowser->append(e);

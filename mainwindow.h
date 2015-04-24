@@ -10,6 +10,12 @@
 #include <Mat.h>
 //#include <iostream> //debug用
 
+class MatXChar{
+public:
+	char c;
+	Mat m;
+};
+
 namespace Ui {
 class MainWindow;
 }

@@ -217,5 +217,6 @@ std::string Vec::toString(){
 	for(int i=0;i<dim;++i){
 		out<<data[i]<<" ";
 	}
+	out<<"\n";
 	return out.str();
 }
