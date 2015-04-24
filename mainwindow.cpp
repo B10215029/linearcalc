@@ -377,14 +377,16 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 
 void MainWindow::on_pushButton_10_clicked()//未定義
 {
-	Vec a,b,c;
-	a.setData(62.944737,0);
-	a.setData(81.158387,1);
-	a.setData(-74.602637,2);
-	b.setData(82.675171,0);
-	b.setData(26.471849,1);
-	b.setData(-80.491919,2);
-	ui->textBrowser->append(QString::fromStdString(a.planeNormal(b).toString()));
+	try{
+		Vec a[]={v[8],v[9],v[10],v[11],v[12],v[13],v[14],v[15],v[16],v[17],
+				v[18],v[19],v[20],v[21],v[22],v[23],v[24],v[25],v[26],v[27]};
+		Vec::ob(a);
+		for(int i=0;i<20;i++)
+			ui->textBrowser->append(QString::fromStdString(a[i].toString()));
+	}
+	catch(const char* e){
+		ui->textBrowser->append(e);
+	}
 }
 
 void MainWindow::on_actionSave_triggered()

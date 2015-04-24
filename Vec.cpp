@@ -131,8 +131,9 @@ Vec Vec::normal(){//----normal
 	return v;
 }
 void Vec::normalize(){//----normalize
+	double n=norm();
 	for(int i=0;i<dim;i++)
-		data[i]=data[i]/norm();
+		data[i]=data[i]/n;
 }
 double Vec::dot(const Vec& v){//----Dot Product
 	if(dim!=v.dim) throw "dot失敗，維度不同!";
@@ -187,6 +188,17 @@ bool Vec::isOrtho(const Vec& v){//----Orthogonal
 }
 Vec Vec::planeNormal(Vec& v){
 	return cross3(v);
+}
+void Vec::ob(Vec* v){
+	int d=v[0].dim;
+	v[0].normalize();
+	for(int i=1;i<d;i++){
+		if(v[i].dim!=d) throw "ob失敗，維度不同!";
+		for(int j=0;j<i;j++){
+			v[i]=v[i]-v[i].proj(v[j]);
+			v[i].normalize();
+		}
+	}
 }
 //std::string Vec::toString(){
 //	std::ostringstream out;
