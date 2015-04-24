@@ -48,6 +48,7 @@ public:
 	bool isParal(Vec &v);
 	bool isOrtho(const Vec& v);
 	Vec planeNormal(Vec& v);
+	static void ob(Vec* v);
 ////////// ////////// ////////// //////////
 	std::string toString();
 };
