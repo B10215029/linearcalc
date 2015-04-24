@@ -387,32 +387,6 @@ void Mat::LU(Mat& l,Mat& u,int& swapCount){
 				p.data[j][k]-=muti*p.data[i][k];
 		}
 	l=p.Inverse();
-
-	//type2 directly assign
-//	l=Mat::identity(row);
-//	u=Mat::zeroSquare(row);
-//	for(int i=0;i<row;i++){ //directly assign
-//		for(int j=0;j<row;j++){
-//			double s=0;
-
-//			if(i<=j){
-//				for(int k=0;k<i;k++){
-//					if(k==i) continue;
-//					s+=l.data[i][k]*u.data[k][j];
-//				}
-//				u.data[i][j]=(data[i][j]-s)/l.data[i][i];
-//			}
-//			else if(i>j){
-//				for(int k=0;k<j;k++){
-//					if(k==j) continue;
-//					s+=l.data[i][k]*u.data[k][j];
-//				}
-//				l.data[i][j]=(data[i][j]-s)/u.data[j][j];
-//			}
-
-//		}
-//	}
-
 }
 bool Mat::IsLI(){
 	if(row>col)
@@ -421,15 +395,25 @@ bool Mat::IsLI(){
 		return true;
 	return false;
 }
-Mat Mat::SolveSquareLinearSys(Vec& b){
-	if(row!=col || row!=b.getDim()) throw "SolveSquareLinearSys失敗，維度不同!";
-	Mat l,u;
+Mat Mat::SolveSquareLinearSys(Mat& b){
+	if(row!=col || row!=b.row || b.col!=1) throw "SolveSquareLinearSys失敗，維度不同!";
+	Mat l,u,x(row,1),y(row,1);
+	y.data[0][0]=x.data[0][0]=1;
 	int s;
-	LU(l,u,s);
-
-//	ax=b=lux=ly;
-//	ux=y;
-//	ly=b;
+	LU(l,u,s); //ax=b=lux=ly
+	for(int i=0;i<row;i++){ //ly=b
+		double sum=0;
+		for(int j=i-1;j>=0;j--)
+			sum+=l.data[i][j]*y.data[j][0];
+		y.data[i][0]=(b.data[i][0]-sum)/l.data[i][i];
+	}
+	for(int i=row-1;i>=0;i--){ //ux=y
+		double sum=0;
+		for(int j=i+1;j<col;j++)
+			sum+=u.data[i][j]*x.data[j][0];
+		x.data[i][0]=(y.data[i][0]-sum)/u.data[i][i];
+	}
+	return x;
 }
 std::string Mat::toString(){
 	std::ostringstream out;

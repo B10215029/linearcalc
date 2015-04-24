@@ -15,7 +15,7 @@ public:
 	Mat();
 	Mat(int r,int c);
 	Mat(double** d,int r,int c);
-	Mat(Vec *v, int r, int c);
+	Mat(Vec *v,int r,int c);
 	Mat(Vec& v);
 	Mat(const Mat& m);
 	~Mat();
@@ -49,7 +49,7 @@ public:
 	void LU(Mat& p,Mat& l,Mat& u);
 	void LU(Mat& l,Mat& u,int& swapCount);//type1 row reduction
 	bool IsLI();
-	Mat SolveSquareLinearSys(Vec& b);
+	Mat SolveSquareLinearSys(Mat& b);
 ////////// ////////// ////////// //////////
 	std::string toString();
 };
