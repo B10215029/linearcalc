@@ -9,7 +9,7 @@ protected:
 	int row,col;
 	void initData(int r,int c);
 	void deleteData();
-	Mat minor_mat(int r, int c);
+	Mat minor_mat(int r,int c);
 	void swapRow(int x,int y);
 public:
 	Mat();
@@ -27,11 +27,11 @@ public:
 	//第1參數非Vec,不能是memberFunc,有其它memberFunc用到,so要宣告,不加friend會當作memberFunc
 	friend Mat operator*(const double c,const Mat& m);
 	Mat operator/(const double c);
-	bool operator==(Mat& m);
-	bool operator!=(Mat& m);
+	bool operator==(const Mat& m);
+	bool operator!=(const Mat& m);
 	Mat operator=(const Mat& m);
 ////////// ////////// ////////// //////////
-	static Mat zeroSquare(int s);
+	//static Mat zeroSquare(int s);
 	void setData(double** d,int r,int c);
 	void setData(Vec* v,int r,int c);
 	void setData(double d,int r,int c);
@@ -49,7 +49,8 @@ public:
 	void LU(Mat& p,Mat& l,Mat& u);
 	void LU(Mat& l,Mat& u,int& swapCount);//type1 row reduction
 	bool IsLI();
-	Mat SolveSquareLinearSys(Mat& b);
+	Mat SolveSquareLinearSys(const Mat& b);
+	void eigen(Mat& vecs,Vec& vals);
 ////////// ////////// ////////// //////////
 	std::string toString();
 };

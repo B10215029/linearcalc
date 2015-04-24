@@ -98,14 +98,14 @@ Mat Mat::operator/(const double c){//operator override /
 			re.data[i][j]=data[i][j]/c;
 	return re;
 }
-bool Mat::operator==(Mat& m){
+bool Mat::operator==(const Mat& m){
 	if(row!=m.row || col!=m.col) return false;
 	for(int i=0;i<row;i++)
 		for(int j=0;j<col;j++)
 			if(data[i][j]!=m.data[i][j]) return false;
 	return true;
 }
-bool Mat::operator!=(Mat& m){
+bool Mat::operator!=(const Mat& m){
 	return !(*this==m);
 }
 
@@ -118,12 +118,12 @@ Mat Mat::operator=(const Mat& m){//operator override =
 	return *this;
 }
 ////////// ////////// ////////// //////////
-Mat Mat::zeroSquare(int s){//----0
-	Mat m(s,s);
-	for(int i=0;i<m.row;i++)
-		m.data[i][i]=0;
-	return m;
-}
+//Mat Mat::zeroSquare(int s){//----0
+//	Mat m(s,s);
+//	for(int i=0;i<m.row;i++)
+//		m.data[i][i]=0;
+//	return m;
+//}
 void Mat::setData(double** d,int r,int c){//屬重新設定，不判斷範圍
 	deleteData();
 	initData(r,c);
@@ -167,12 +167,13 @@ Mat Mat::identity(int s){
 	return m;
 }
 int Mat::Rank(Mat& t){
-	Mat u(*this);
+	Mat u(*this),p=Mat::identity(row);
 	for(int i=0;i<row;i++) //find nearest row not 0 element
 		if(u.data[i][i]==0)
 			for(int j=i+1;j<row;j++)
 				if(u.data[j][i]!=0){
 					u.swapRow(i,j);
+					p.swapRow(i,j);
 					break;
 				}
 	for(int i=0;i<row;i++) //從上往下消其他row
@@ -182,6 +183,8 @@ int Mat::Rank(Mat& t){
 			u.data[j][i]=0;
 			for(int k=i+1;k<col;k++)
 				u.data[j][k]-=muti*u.data[i][k];
+			for(int k=i+1;k<col;k++)
+				p.data[j][k]-=muti*p.data[i][k];
 		}
 	for(int i=row-1;i>=0;i--) //從下往上消其他row
 		for(int j=i-1;j>=0;j--){
@@ -190,15 +193,18 @@ int Mat::Rank(Mat& t){
 			u.data[j][i]=0;
 			for(int k=i-1;k>=0;k--)
 				u.data[j][k]-=muti*u.data[i][k];
+			for(int k=i-1;k>=0;k--)
+				p.data[j][k]-=muti*p.data[i][k];
 		}
 	for(int i=0;i<row;i++) //變1
 		if(u.data[i][i]!=0){
 			double div=u.data[i][i];
-			for(int j=0;j<col;j++)
+			for(int j=0;j<col;j++){
 				u.data[i][j]/=div;
+				p.data[i][j]/=div;
+			}
 		}
-
-	t=u;
+	t=p;
 	int rank=u.row;
 	for(int i=0;i<u.row;i++){
 		for(int j=0;j<u.col;j++){
@@ -392,10 +398,13 @@ bool Mat::IsLI(){
 	if(row>col)
 		return false;
 	//if(Rank()==row)
+	Mat a=trans(),b(a.col,1);
+	Mat x=a.SolveSquareLinearSys(b),zero(a.row,1);
+	if(x==zero)
 		return true;
 	return false;
 }
-Mat Mat::SolveSquareLinearSys(Mat& b){
+Mat Mat::SolveSquareLinearSys(const Mat& b){
 	if(row!=col || row!=b.row || b.col!=1) throw "SolveSquareLinearSys失敗，維度不同!";
 	Mat l,u,x(row,1),y(row,1);
 	y.data[0][0]=x.data[0][0]=1;
@@ -414,6 +423,9 @@ Mat Mat::SolveSquareLinearSys(Mat& b){
 		x.data[i][0]=(y.data[i][0]-sum)/u.data[i][i];
 	}
 	return x;
+}
+void Mat::eigen(Mat& vecs,Vec& vals){
+
 }
 std::string Mat::toString(){
 	std::ostringstream out;

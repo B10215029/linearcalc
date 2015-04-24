@@ -344,7 +344,7 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 	try{
 //		Mat l,u;
 //		int swapCount;
-//		m[0].LU(l,u,swapCount);
+//		m[2].LU(l,u,swapCount);
 //		ui->textBrowser->append(QString::fromStdString((l*u).toString())+"\n");
 //		ui->textBrowser->append(QString::fromStdString(l.toString())+"\n");
 //		ui->textBrowser->append(QString::fromStdString(u.toString())+"\n");
@@ -361,8 +361,13 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 //		ui->textBrowser->append(QString::fromStdString((m[0].Inverse()*m[0]).toString())+"\n");
 /////////////////////////////////////
 //		Mat t;
+//		ui->textBrowser->append(QString::number(m[0].Rank(t))+"\n");
+//		ui->textBrowser->append(QString::fromStdString(t.toString())+"\n");
+//		ui->textBrowser->append(QString::number(m[1].Rank(t))+"\n");
+//		ui->textBrowser->append(QString::fromStdString(t.toString())+"\n");
 //		ui->textBrowser->append(QString::number(m[2].Rank(t))+"\n");
 //		ui->textBrowser->append(QString::fromStdString(t.toString())+"\n");
+//		ui->textBrowser->append(QString::fromStdString((t.Inverse()*Mat::identity(t.getRow())).toString())+"\n");
 /////////////////////////////////////
 //		ui->textBrowser->append(QString::number(v[0].dot(v[1]))+"\n");
 //		ui->textBrowser->append(QString::number(v[2].dot(v[3]))+"\n");
@@ -370,9 +375,11 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 /////////////////////////////////////
 		//ui->textBrowser->append(QString::number(v[6].isOrtho(v[7]))+"\n");
 /////////////////////////////////////
-		ui->textBrowser->append(QString::fromStdString(m[0].SolveSquareLinearSys(m[1]).toString())+"\n");
-		ui->textBrowser->append(QString::fromStdString(m[2].SolveSquareLinearSys(m[3]).toString())+"\n");
-		ui->textBrowser->append(QString::fromStdString(m[4].SolveSquareLinearSys(m[5]).toString())+"\n");
+//		ui->textBrowser->append(QString::fromStdString(m[0].SolveSquareLinearSys(m[1]).toString())+"\n");
+//		ui->textBrowser->append(QString::fromStdString(m[2].SolveSquareLinearSys(m[3]).toString())+"\n");
+//		ui->textBrowser->append(QString::fromStdString(m[4].SolveSquareLinearSys(m[5]).toString())+"\n");
+/////////////////////////////////////
+
 	}
 	catch(const char* e){
 		ui->textBrowser->append(e);
