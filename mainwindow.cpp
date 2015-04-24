@@ -481,7 +481,7 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 void MainWindow::on_pushButton_10_clicked()//未定義
 {
 	try{
-		ui->textBrowser->append(QString::fromStdString(a[i].toString()));
+		//ui->textBrowser->append(QString::fromStdString(a[i].toString()));
 	}
 	catch(const char* e){
 		ui->textBrowser->append(e);

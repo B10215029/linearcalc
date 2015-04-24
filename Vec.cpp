@@ -3,6 +3,7 @@
 #ifndef M_PI//有時候我需要切換許多的編譯器來DEBUG
 #define M_PI 3.1415926535897932384626
 #endif
+#define EQU(a,b)((a>b?a:b)-(a<b?a:b))<0.0000000001
 
 Vec::Vec(){
 	data=new double[3];
@@ -180,11 +181,11 @@ double Vec::cross3_norm(const Vec& v){
 }
 bool Vec::isParal(Vec& v){
 	if(dim!=v.dim) throw "isParal失敗，維度不同!";
-	return (angle_cos(v)==1||angle_cos(v)==-1);
+	return (EQU(angle_cos(v),1)||EQU(angle_cos(v),-1));
 }
 bool Vec::isOrtho(const Vec& v){//----Orthogonal
 	if(dim!=v.dim) throw "isOrtho失敗，維度不同!";
-	return dot(v)==0;
+	return EQU(dot(v),0);
 }
 Vec Vec::planeNormal(Vec& v){
 	return cross3(v);
