@@ -4,7 +4,7 @@
 #ifndef M_PI//有時候我需要切換許多的編譯器來DEBUG
 #define M_PI 3.1415926535897932384626
 #endif
-#define EQU(a,b)fabs(a-b)<0.00000001
+#define EQU(a,b) fabs(a-b)<0.00000001
 
 #include <cmath>
 #include <sstream>

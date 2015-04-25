@@ -454,14 +454,9 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 //		ui->textBrowser->append(QString::fromStdString((m[0]*m[0].Inverse()).toString())+"\n");
 //		ui->textBrowser->append(QString::fromStdString((m[0].Inverse()*m[0]).toString())+"\n");
 /////////////////////////////////////
-//		Mat t;
-//		ui->textBrowser->append(QString::number(m[0].Rank(t))+"\n");
-//		ui->textBrowser->append(QString::fromStdString(t.toString())+"\n");
-//		ui->textBrowser->append(QString::number(m[1].Rank(t))+"\n");
-//		ui->textBrowser->append(QString::fromStdString(t.toString())+"\n");
-//		ui->textBrowser->append(QString::number(m[2].Rank(t))+"\n");
-//		ui->textBrowser->append(QString::fromStdString(t.toString())+"\n");
-//		ui->textBrowser->append(QString::fromStdString((t.Inverse()*Mat::identity(t.getRow())).toString())+"\n");
+		ui->textBrowser->append(QString::number(m[0].Rank())+"\n");
+		ui->textBrowser->append(QString::number(m[1].Rank())+"\n");
+		ui->textBrowser->append(QString::number(m[2].Rank())+"\n");
 /////////////////////////////////////
 //		ui->textBrowser->append(QString::number(v[0].dot(v[1]))+"\n");
 //		ui->textBrowser->append(QString::number(v[2].dot(v[3]))+"\n");
@@ -483,7 +478,7 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 void MainWindow::on_pushButton_10_clicked()//未定義
 {
 	try{
-		ui->textBrowser->append(QString("%1").arg(m[2].rankD()));
+		ui->textBrowser->append(QString("%1").arg(m[2].Rank()));
 		ui->textBrowser->append(QString::fromStdString(m[2].toString()));
 	}
 	catch(const char* e){

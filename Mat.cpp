@@ -118,12 +118,6 @@ Mat Mat::operator=(const Mat& m){//operator override =
 	return *this;
 }
 ////////// ////////// ////////// //////////
-//Mat Mat::zeroSquare(int s){//----0
-//	Mat m(s,s);
-//	for(int i=0;i<m.row;i++)
-//		m.data[i][i]=0;
-//	return m;
-//}
 void Mat::setData(double** d,int r,int c){//屬重新設定，不判斷範圍
 	deleteData();
 	initData(r,c);
@@ -165,54 +159,6 @@ Mat Mat::identity(int s){
 	for(int i=0;i<m.row;i++)
 		m.data[i][i]=1;
 	return m;
-}
-int Mat::Rank(Mat& t){
-	Mat u(*this),p=Mat::identity(row);
-	for(int i=0;i<row;i++) //find nearest row not 0 element
-		if(u.data[i][i]==0)
-			for(int j=i+1;j<row;j++)
-				if(u.data[j][i]!=0){
-					u.swapRow(i,j);
-					p.swapRow(i,j);
-					break;
-				}
-	for(int i=0;i<row;i++) //從上往下消其他row
-		for(int j=i+1;j<row;j++){
-			if(u.data[i][i]==0) break;
-			double muti=u.data[j][i]/u.data[i][i];
-			u.data[j][i]=0;
-			for(int k=i+1;k<col;k++)
-				u.data[j][k]-=muti*u.data[i][k];
-			for(int k=i+1;k<col;k++)
-				p.data[j][k]-=muti*p.data[i][k];
-		}
-	for(int i=row-1;i>=0;i--) //從下往上消其他row
-		for(int j=i-1;j>=0;j--){
-			if(u.data[i][i]==0) break;
-			double muti=u.data[j][i]/u.data[i][i];
-			u.data[j][i]=0;
-			for(int k=i-1;k>=0;k--)
-				u.data[j][k]-=muti*u.data[i][k];
-			for(int k=i-1;k>=0;k--)
-				p.data[j][k]-=muti*p.data[i][k];
-		}
-	for(int i=0;i<row;i++) //變1
-		if(u.data[i][i]!=0){
-			double div=u.data[i][i];
-			for(int j=0;j<col;j++){
-				u.data[i][j]/=div;
-				p.data[i][j]/=div;
-			}
-		}
-	t=p;
-	int rank=u.row;
-	for(int i=0;i<u.row;i++){
-		for(int j=0;j<u.col;j++){
-			if(u.data[i][j]!=0) break;
-			if(j==u.col-1) rank--;
-		}
-	}
-	return rank;
 }
 Mat Mat::trans(){
 	Mat m(col,row);
@@ -397,11 +343,12 @@ void Mat::LU(Mat& l,Mat& u,int& swapCount){
 bool Mat::IsLI(){
 	if(row>col)
 		return false;
-	//if(Rank()==row)//rank目前有問題
-	Mat a=trans(),b(a.col,1);
-	Mat x=a.SolveSquareLinearSys(b),zero(a.row,1);
-	if(x==zero)
-		return true;
+	if(Rank()==row) return true;
+
+//	Mat a=trans(),b(a.col,1);
+//	Mat x=a.SolveSquareLinearSys(b),zero(a.row,1);
+//	if(x==zero)
+//		return true;
 	return false;
 }
 Mat Mat::SolveSquareLinearSys(const Mat& b){
@@ -457,7 +404,7 @@ void Mat::eigen3(Mat& vecs,Vec& vals){
 
 	}
 }
-int Mat::rankD(){
+int Mat::Rank(){
 	Mat m(*this);
 	for(int i=0;i<m.row;i++){
 		int maxV=i;
@@ -472,8 +419,6 @@ int Mat::rankD(){
 			}
 		if(m.data[i][i]==0)
 			continue;
-//		for(int j=col-1;j>=i;j--)
-//			data[i][j]/=data[i][i];
 		for(int j=i+1;j<m.row;j++)
 			for(int k=m.col-1;k>=i;k--)
 				m.data[j][k]-=m.data[i][k]*m.data[j][i]/m.data[i][i];
@@ -483,7 +428,6 @@ int Mat::rankD(){
 		r+=!(EQU(m.data[i][i],0));
 	return r;
 }
-
 std::string Mat::toString(){
 	std::ostringstream out;
 	for(int i=0;i<row;i++){

@@ -31,7 +31,6 @@ public:
 	bool operator!=(const Mat& m);
 	Mat operator=(const Mat& m);
 ////////// ////////// ////////// //////////
-	//static Mat zeroSquare(int s);
 	void setData(double** d,int r,int c);
 	void setData(Vec* v,int r,int c);
 	void setData(double d,int r,int c);
