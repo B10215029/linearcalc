@@ -70,7 +70,7 @@ Mat MainWindow::calc(QString &inputStr){
 			int indexOffset=-65;
 			while(inputStr[++i]=='Z')
 				indexOffset+=25;
-			mxc.m=Mat(m[inputStr[++i].toLatin1()+indexOffset]);
+			mxc.m=Mat(m[inputStr[i].toLatin1()+indexOffset]);
 			mxc.c='M';
 			stack.push(mxc);
 		}
@@ -199,8 +199,8 @@ void MainWindow::on_pushButton_clicked()
 					for(int c=0;c<mm.getCol();c++)
 						mm.setData(args[4+k++].toDouble(),r,c);
 				m.push_back(mm);
-				ui->comboBox_2->addItem(QString("M%1").arg(QString("Z").repeated((v.size()-1)/25)+(97+((v.size()-1)%25))));
-				ui->textBrowser->append(QString("new %1").arg(ui->comboBox->itemText(ui->comboBox->count()-1)));
+				ui->comboBox_2->addItem(QString("M%1").arg(QString("Z").repeated((m.size()-1)/25)+(97+((m.size()-1)%25))));
+				ui->textBrowser->append(QString("new %1").arg(ui->comboBox_2->itemText(ui->comboBox_2->count()-1)));
 			}
 		}
 		else if(inst=="cls"){//清除輸出畫面
@@ -366,7 +366,7 @@ void MainWindow::on_actionOpen_triggered()//Qt讀檔方式
 				m.push_back(mm);
 
 				//加到下拉選單中
-				ui->comboBox_2->addItem(QString("M%1").arg(QString("Z").repeated((v.size()-1)/25)+(97+((v.size()-1)%25))));
+				ui->comboBox_2->addItem(QString("M%1").arg(QString("Z").repeated((m.size()-1)/25)+(97+((m.size()-1)%25))));
 			}
 		}
 		//Output to TextBrowser
@@ -483,7 +483,8 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 void MainWindow::on_pushButton_10_clicked()//未定義
 {
 	try{
-		//ui->textBrowser->append(QString::fromStdString(a[i].toString()));
+		ui->textBrowser->append(QString("%1").arg(m[2].rankD()));
+		ui->textBrowser->append(QString::fromStdString(m[2].toString()));
 	}
 	catch(const char* e){
 		ui->textBrowser->append(e);

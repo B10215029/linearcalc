@@ -51,6 +51,7 @@ public:
 	bool IsLI();
 	Mat SolveSquareLinearSys(const Mat& b);
 	void eigen(Mat& vecs,Vec& vals);
+	int rankD();
 ////////// ////////// ////////// //////////
 	std::string toString();
 };

@@ -427,6 +427,33 @@ Mat Mat::SolveSquareLinearSys(const Mat& b){
 void Mat::eigen(Mat& vecs,Vec& vals){
 
 }
+int Mat::rankD(){
+	Mat m(*this);
+	for(int i=0;i<m.row;i++){
+		int maxV=i;
+		for(int j=i+1;j<m.row;j++)
+			if(fabs(m.data[j][i])>fabs(m.data[maxV][i]))
+				maxV=j;
+		if(maxV!=i)
+			for(int j=i;j<m.col;j++){
+				double t=m.data[i][j];
+				m.data[i][j]=m.data[maxV][j];
+				m.data[maxV][j]=t;
+			}
+		if(m.data[i][i]==0)
+			continue;
+//		for(int j=col-1;j>=i;j--)
+//			data[i][j]/=data[i][i];
+		for(int j=i+1;j<m.row;j++)
+			for(int k=m.col-1;k>=i;k--)
+				m.data[j][k]-=m.data[i][k]*m.data[j][i]/m.data[i][i];
+	}
+	int r=0;
+	for(int i=0;i<m.row;i++)
+		r+=!(EQU(m.data[i][i],0));
+	return r;
+}
+
 std::string Mat::toString(){
 	std::ostringstream out;
 	for(int i=0;i<row;i++){
