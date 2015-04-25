@@ -176,7 +176,7 @@ double Vec::cross3_norm(const Vec& v){
 }
 bool Vec::isParal(Vec& v){
 	if(dim!=v.dim) throw "isParal失敗，維度不同!";
-	return (EQU(angle_cos(v),1)||EQU(angle_cos(v),-1));
+	return (EQU(angle_cos(v),1)||EQU(angle_cos(v),0-1));
 }
 bool Vec::isOrtho(const Vec& v){//----Orthogonal
 	if(dim!=v.dim) throw "isOrtho失敗，維度不同!";

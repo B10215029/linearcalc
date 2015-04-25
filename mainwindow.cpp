@@ -531,9 +531,9 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 //		ui->textBrowser->append(QString::fromStdString((m[0]*m[0].Inverse()).toString())+"\n");
 //		ui->textBrowser->append(QString::fromStdString((m[0].Inverse()*m[0]).toString())+"\n");
 /////////////////////////////////////
-		ui->textBrowser->append(QString::number(m[0].Rank())+"\n");
-		ui->textBrowser->append(QString::number(m[1].Rank())+"\n");
-		ui->textBrowser->append(QString::number(m[2].Rank())+"\n");
+//		ui->textBrowser->append(QString::number(m[0].Rank())+"\n");
+//		ui->textBrowser->append(QString::number(m[1].Rank())+"\n");
+//		ui->textBrowser->append(QString::number(m[2].Rank())+"\n");
 /////////////////////////////////////
 //		ui->textBrowser->append(QString::number(v[0].dot(v[1]))+"\n");
 //		ui->textBrowser->append(QString::number(v[2].dot(v[3]))+"\n");
@@ -545,7 +545,14 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 //		ui->textBrowser->append(QString::fromStdString(m[2].SolveSquareLinearSys(m[3]).toString())+"\n");
 //		ui->textBrowser->append(QString::fromStdString(m[4].SolveSquareLinearSys(m[5]).toString())+"\n");
 /////////////////////////////////////
-
+		Mat eiV;
+		Vec vv;
+		m[1].eigen3(eiV,vv);
+		ui->textBrowser->append(QString::fromStdString(vv.toString())+"\n");
+		ui->textBrowser->append(QString::fromStdString(eiV.toString())+"\n");
+		m[2].eigen3(eiV,vv);
+		ui->textBrowser->append(QString::fromStdString(vv.toString())+"\n");
+		ui->textBrowser->append(QString::fromStdString(eiV.toString())+"\n");
 	}
 	catch(const char* e){
 		ui->textBrowser->append(e);

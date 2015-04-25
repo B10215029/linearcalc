@@ -228,6 +228,55 @@ Mat Mat::Adj(){
 			m.setData(cofactor(i,j),j,i);
 	return m;
 }
+Mat Mat::GaussJordanRowReduction(){
+	Mat p=Mat::identity(row);
+	for(int i=0;i<row;i++) //find nearest row not 0 element
+		if(data[i][i]==0)
+			for(int j=i+1;j<row;j++)
+				if(data[j][i]!=0){
+					swapRow(i,j);
+					p.swapRow(i,j);
+					break;
+				}
+	for(int i=0;i<row;i++) //從上往下消其他row
+		for(int j=i+1;j<row;j++){
+			if(data[i][i]==0) break;
+			double muti=data[j][i]/data[i][i];
+			data[j][i]=0;
+			for(int k=i+1;k<col;k++)
+				data[j][k]-=muti*data[i][k];
+			for(int k=0;k<col;k++)
+				p.data[j][k]-=muti*p.data[i][k];
+		}
+	for(int i=0;i<row;i++) //變0
+		for(int j=0;j<col;j++)
+			if(EQU(data[i][j],0)) data[i][j]=0;
+	for(int i=row-1;i>=0;i--) //從下往上消其他row
+		for(int j=i-1;j>=0;j--){
+			if(data[i][i]==0) break;
+			double muti=data[j][i]/data[i][i];
+			data[j][i]=0;
+			for(int k=i-1;k>=0;k--)
+				data[j][k]-=muti*data[i][k];
+			for(int k=row-1;k>=0;k--)
+				p.data[j][k]-=muti*p.data[i][k];
+		}
+	for(int i=0;i<row;i++) //變0
+		for(int j=0;j<col;j++)
+			if(EQU(data[i][j],0)) data[i][j]=0;
+	for(int i=0;i<row;i++) //變1
+		if(data[i][i]!=0){
+			double div=data[i][i];
+			for(int j=0;j<col;j++){
+				data[i][j]/=div;
+				p.data[i][j]/=div;
+			}
+		}
+	for(int i=0;i<row;i++) //變0
+		for(int j=0;j<col;j++)
+			if(EQU(data[i][j],0)) data[i][j]=0;
+	return p;
+}
 Mat Mat::Inverse(){
 	//type1 Adj()/det() 可能造成太多cost
 //	double x=det();
@@ -236,45 +285,9 @@ Mat Mat::Inverse(){
 
 	//type2 rrf
 	if(row!=col) throw "Inverse失敗，not square matrix!";
-	Mat u(*this),p=Mat::identity(row);
-	for(int i=0;i<row;i++) //find nearest row not 0 element
-		if(u.data[i][i]==0)
-			for(int j=i+1;j<row;j++)
-				if(u.data[j][i]!=0){
-					u.swapRow(i,j);
-					p.swapRow(i,j);
-					break;
-				}
-	for(int i=0;i<row;i++) //從上往下消其他row
-		for(int j=i+1;j<row;j++){
-			if(u.data[i][i]==0) break;
-			double muti=u.data[j][i]/u.data[i][i];
-			u.data[j][i]=0;
-			for(int k=i+1;k<col;k++)
-				u.data[j][k]-=muti*u.data[i][k];
-			for(int k=0;k<col;k++)
-				p.data[j][k]-=muti*p.data[i][k];
-		}
-	for(int i=row-1;i>=0;i--) //從下往上消其他row
-		for(int j=i-1;j>=0;j--){
-			if(u.data[i][i]==0) break;
-			double muti=u.data[j][i]/u.data[i][i];
-			u.data[j][i]=0;
-			for(int k=i-1;k>=0;k--)
-				u.data[j][k]-=muti*u.data[i][k];
-			for(int k=row-1;k>=0;k--)
-				p.data[j][k]-=muti*p.data[i][k];
-		}
-	for(int i=0;i<row;i++) //變1
-		if(u.data[i][i]!=0){
-			double div=u.data[i][i];
-			for(int j=0;j<col;j++){
-				u.data[i][j]/=div;
-				p.data[i][j]/=div;
-			}
-		}
-	Mat iden=Mat::identity(row);
-	if(u!=iden) throw "沒有Inverse!";
+	Mat a(*this),p,iden=Mat::identity(row);
+	p=a.GaussJordanRowReduction();
+	if(a!=iden) throw "沒有Inverse!";
 	return p;
 }
 void Mat::LU(Mat& l,Mat& u,int& swapCount){
@@ -307,12 +320,8 @@ void Mat::LU(Mat& l,Mat& u,int& swapCount){
 bool Mat::IsLI(){
 	if(row>col)
 		return false;
-	if(Rank()==row) return true;
-
-//	Mat a=trans(),b(a.col,1);
-//	Mat x=a.SolveSquareLinearSys(b),zero(a.row,1);
-//	if(x==zero)
-//		return true;
+	if(Rank()==row)
+		return true;
 	return false;
 }
 Mat Mat::SolveSquareLinearSys(const Mat& b){
@@ -335,33 +344,59 @@ Mat Mat::SolveSquareLinearSys(const Mat& b){
 	}
 	return x;
 }
+//#define a poly[2]
+//#define b poly[1]
+//#define c poly[0]
+//#define Q (pow(a,2)-3*b)/9
+//#define R (2*pow(a,3)-9*a*b+27*c)/54
+//#define theta acos(R/pow(Q,3/2))
+//#define Qcos(x) -2*pow(Q,0.5)*cos((theta+x)/3)-a/3
+double Qcos(double x,double a, double Q,double theta){
+	return -2*pow(Q,0.5)*cos((theta+x)/3)-a/3;
+}
 void Mat::eigen3(Mat& vecs,Vec& vals){
 	if(row!=col || row!=3) throw "eigen3失敗，維度不同!";
 	if(row==3){
-		double poly[3],Q,R,theta;//-x^3+c2*x^2+c1*x+c0=0
+		double poly[3];//x^3+a*x^2+b*x+c=0
 		poly[0]=-det();
-		poly[1]=data[0][0]+data[1][1]+data[2][2]-
+		poly[1]=data[0][0]*data[1][1]+data[0][0]*data[2][2]+data[1][1]*data[2][2]-
 				data[0][2]*data[2][0]-
 				data[1][2]*data[2][1]-
 				data[0][1]*data[1][0];
 		poly[2]=-data[0][0]-data[1][1]-data[2][2];
 
-		Q=(pow(poly[2],2)-3*poly[1])/9;
-		R=(pow(poly[2],3)-9*poly[2]*poly[1]+27*poly[0])/54;
+		double a=poly[2],
+		b=poly[1],
+		c=poly[0],
+		Q=(pow(a,2)-3*b)/9,
+		R=(2*pow(a,3)-9*a*b+27*c)/54,
 		theta=acos(R/pow(Q,3/2));
-		#define Qcos(x) -2*pow(Q,0.5)*cos((theta+x)/3)-poly[2]/3
 
-		vals.setData(Qcos(0),0);
-		vals.setData(Qcos(2*M_PI),1);
-		vals.setData(Qcos(-2*M_PI),2);
+		vals.setData(Qcos(0,a,Q,theta),0);
+		vals.setData(Qcos(2*M_PI,a,Q,theta),1);
+		vals.setData(Qcos(-2*M_PI,a,Q,theta),2);
 
-		Mat zero(col,1),u;
+//		vals.setData(poly[0],0);
+//		vals.setData(poly[1],1);
+//		vals.setData(poly[2],2);
+
+		Mat zero(col,1),a_l,eigenVectors(row,col);
+		vecs=eigenVectors;
 		for(int i=0;i<3;i++){
-			u=*this;
+			a_l=*this;
 			for(int j=0;j<row;j++)
-				u.data[j][j]-=poly[i];
-			Mat v=u.SolveSquareLinearSys(zero);
-			vecs;
+				a_l.data[j][j]-=poly[i];
+			a_l.GaussJordanRowReduction();
+			for(int ii=row-1;ii>=0;ii--){
+				double sum=0;
+				if(a_l.data[ii][ii]==0){
+					vecs.data[i][ii]=1;
+					continue;
+				}
+				for(int j=ii+1;j<col;j++)
+					sum+=a_l.data[ii][j]*vecs.data[i][ii];
+				vecs.data[i][ii]=(zero.data[ii][0]-sum)/a_l.data[ii][ii];
+			}
 		}
 	}
 	else if(row==2){

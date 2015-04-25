@@ -43,6 +43,7 @@ public:
 	double cofactor(int r,int c);
 	double det();//type1 LU()
 	Mat Adj();
+	Mat GaussJordanRowReduction();
 	Mat Inverse();//type2 rrf
 	void LU(Mat& p,Mat& l,Mat& u);
 	void LU(Mat& l,Mat& u,int& swapCount);//type1 row reduction
