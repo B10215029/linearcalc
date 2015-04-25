@@ -77,11 +77,12 @@ Mat Mat::operator*(const Mat& m){//operator override *
 				re.data[i][j]+=data[i][k]*m.data[k][j];
 	return re;
 }
-Mat operator*(const double c,const Mat& m){//operator override *
-	Mat re(m.row,m.col);
-	for(int i=0;i<m.row;i++)
-		for(int j=0;j<m.col;j++)
-			re.data[i][j]=m.data[i][j]*c;
+Mat Mat::operator*(Vec& v){
+	Mat re=*this*Mat(v).trans();
+	return re;
+}
+Mat operator*(Vec& v,const Mat& m){
+	Mat re=Mat(v)*m;
 	return re;
 }
 Mat Mat::operator*(const double c){//operator override *
@@ -89,6 +90,13 @@ Mat Mat::operator*(const double c){//operator override *
 	for(int i=0;i<row;i++)
 		for(int j=0;j<col;j++)
 			re.data[i][j]=data[i][j]*c;
+	return re;
+}
+Mat operator*(const double c,const Mat& m){//operator override *
+	Mat re(m.row,m.col);
+	for(int i=0;i<m.row;i++)
+		for(int j=0;j<m.col;j++)
+			re.data[i][j]=m.data[i][j]*c;
 	return re;
 }
 Mat Mat::operator/(const double c){//operator override /
@@ -344,37 +352,45 @@ Mat Mat::SolveSquareLinearSys(const Mat& b){
 	}
 	return x;
 }
-//#define a poly[2]
-//#define b poly[1]
-//#define c poly[0]
-//#define Q (pow(a,2)-3*b)/9
-//#define R (2*pow(a,3)-9*a*b+27*c)/54
-//#define theta acos(R/pow(Q,3/2))
-//#define Qcos(x) -2*pow(Q,0.5)*cos((theta+x)/3)-a/3
-double Qcos(double x,double a, double Q,double theta){
-	return -2*pow(Q,0.5)*cos((theta+x)/3)-a/3;
-}
+#define a poly[2]
+#define b poly[1]
+#define c poly[0]
+#define Q (pow(a,2)-3*b)/9
+#define R (2*pow(a,3)-9*a*b+27*c)/54
+#define theta acos(R/pow(Q,3/2))
+#define Qcos(x) -2*pow(Q,0.5)*cos((theta+x)/3)-a/3
+//double Qcos(double x,double a, double Q,double theta){
+//	return -2*pow(Q,0.5)*cos((theta+x)/3)-a/3;
+//}
 void Mat::eigen3(Mat& vecs,Vec& vals){
-	if(row!=col || row!=3) throw "eigen3失敗，維度不同!";
+	if(row!=col || row>3) throw "eigen3失敗，維度不同!";
 	if(row==3){
 		double poly[3];//x^3+a*x^2+b*x+c=0
-		poly[0]=-det();
-		poly[1]=data[0][0]*data[1][1]+data[0][0]*data[2][2]+data[1][1]*data[2][2]-
-				data[0][2]*data[2][0]-
-				data[1][2]*data[2][1]-
+		Vec eigenValues(row);
+		vals=eigenValues;
+		poly[0]=-data[0][0]*data[1][1]*data[2][2]
+				+data[0][1]*data[1][2]*data[2][0]
+				+data[0][2]*data[1][0]*data[2][1]
+
+				-data[0][2]*data[1][1]*data[2][0]
+				-data[0][0]*data[1][2]*data[2][1]
+				-data[0][1]*data[1][0]*data[2][2];
+		poly[1]=data[0][0]*data[1][1]+data[0][0]*data[2][2]+data[1][1]*data[2][2]+
+				data[0][2]*data[2][0]+
+				data[1][2]*data[2][1]+
 				data[0][1]*data[1][0];
 		poly[2]=-data[0][0]-data[1][1]-data[2][2];
 
-		double a=poly[2],
-		b=poly[1],
-		c=poly[0],
-		Q=(pow(a,2)-3*b)/9,
-		R=(2*pow(a,3)-9*a*b+27*c)/54,
-		theta=acos(R/pow(Q,3/2));
+//		double a=poly[2],
+//		b=poly[1],
+//		c=poly[0],
+//		Q=(pow(a,2)-3*b)/9,
+//		R=(2*pow(a,3)-9*a*b+27*c)/54,
+//		theta=acos(R/pow(Q,1.5));
 
-		vals.setData(Qcos(0,a,Q,theta),0);
-		vals.setData(Qcos(2*M_PI,a,Q,theta),1);
-		vals.setData(Qcos(-2*M_PI,a,Q,theta),2);
+		vals.setData(Qcos(0),0);
+		vals.setData(Qcos(2*M_PI),1);
+		vals.setData(Qcos(-2*M_PI),2);
 
 //		vals.setData(poly[0],0);
 //		vals.setData(poly[1],1);
@@ -400,7 +416,15 @@ void Mat::eigen3(Mat& vecs,Vec& vals){
 		}
 	}
 	else if(row==2){
-
+		Vec eigenValues(row);
+		vals=eigenValues;
+		double poly[2];//x^2+b*x+c=0
+		poly[0]=-data[0][0]*data[1][1]-data[0][1]*data[1][0];
+		poly[1]=data[0][0]+data[1][1]-data[0][1]*data[1][0];
+#define quadric0 (-b+pow(pow(b,2)-4*c,0.5))/2
+#define quadric1 (-b-pow(pow(b,2)-4*c,0.5))/2
+		vals.setData(quadric0,0);
+		vals.setData(quadric1,1);
 	}
 }
 int Mat::Rank(){
@@ -429,6 +453,26 @@ int Mat::Rank(){
 }
 Mat Mat::LS(Mat& v){
 	return (trans()*(*this)).Inverse()*trans()*v;
+}
+double Mat::PowerMethod(Vec& xn){
+	if(row!=col) throw "PowerMethod失敗，not square matrix!";
+	double lambda;
+	Vec initVec(row),lastVec;
+	xn=initVec;
+	xn.setI();
+//	do{
+	for(int i=0;i<9999;i++){
+//		lastVec=xn;
+//		Mat t=(*this)*(Mat(xn).trans());
+//		xn=t.getColData(0).normal();
+		xn=(*this*xn).getColData(0).normal();
+	}
+//	}while(EQU((lastVec-xn).norm(),0));
+//	Mat axn=(*this)*(Mat(xn).trans());
+//	Vec vaxn=axn.getColData(0);
+//	lambda=(vaxn*xn)/(xn*xn);
+	lambda=(*this*xn).getColData(0)*xn/(xn*xn);
+	return lambda;
 }
 std::string Mat::toString(){
 	std::ostringstream out;

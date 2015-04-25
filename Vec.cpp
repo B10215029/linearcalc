@@ -39,18 +39,23 @@ Vec Vec::operator-(const Vec& v){//----Subtraction
 		re.data[i]=data[i]-v.data[i];
 	return re;
 }
-
+Vec operator*(const double c,const Vec& v1){//----Scalar multiplication
+	Vec v(v1.dim);
+	for(int i=0;i<v1.dim;i++)
+		v.data[i]=c*v1.data[i];
+	return v;
+}
 Vec Vec::operator*(const double c){//----Scalar multiplication
 	Vec v(dim);
 	for(int i=0;i<dim;i++)
 		v.data[i]=c*data[i];
 	return v;
 }
-Vec operator*(const double c,const Vec& v1){//----Scalar multiplication
-	Vec v(v1.dim);
-	for(int i=0;i<v1.dim;i++)
-		v.data[i]=c*v1.data[i];
-	return v;
+double Vec::operator*(const Vec& c){//----Scalar multiplication
+	double s=0;
+	for(int i=0;i<dim;i++)
+		s+=c.data[i]*data[i];
+	return s;
 }
 Vec Vec::operator/(const double c){//----Scalar division
 	if(c==0) throw "不可除以0";
@@ -80,7 +85,7 @@ void Vec::setO(){//----0
 }
 void Vec::setI(){//----1
 	for(int i=0;i<dim;i++)
-		data[i]=1.;
+		data[i]=1;
 }
 void Vec::setData(double* d,int s){
 	if(data) delete[] data;

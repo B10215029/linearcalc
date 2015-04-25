@@ -23,6 +23,9 @@ public:
 	Mat operator+(const Mat& m);
 	Mat operator-(const Mat& m);
 	Mat operator*(const Mat& m);
+	Mat operator*(Vec& v);
+	//第1參數非Vec,不能是memberFunc,有其它memberFunc用到,so要宣告,不加friend會當作memberFunc
+	friend Mat operator*(Vec& v,const Mat& m);
 	Mat operator*(const double c);
 	//第1參數非Vec,不能是memberFunc,有其它memberFunc用到,so要宣告,不加friend會當作memberFunc
 	friend Mat operator*(const double c,const Mat& m);
@@ -52,6 +55,7 @@ public:
 	void eigen3(Mat& vecs,Vec& vals);
 	int Rank();
 	Mat LS(Mat& v);
+	double PowerMethod(Vec& xn);
 ////////// ////////// ////////// //////////
 	std::string toString();
 };

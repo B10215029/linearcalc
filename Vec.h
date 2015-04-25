@@ -25,6 +25,7 @@ public:
 	//第1參數非Vec,不能是memberFunc,有其它memberFunc用到,so要宣告,不加friend會當作memberFunc
 	friend Vec operator*(const double c,const Vec& v1);
 	Vec operator*(const double c);
+	double operator*(const Vec& c);
 	Vec operator/(const double c);
 	bool operator==(Vec& v);
 	bool operator!=(Vec& v);
