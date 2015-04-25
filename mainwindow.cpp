@@ -75,13 +75,14 @@ Mat MainWindow::calc(QString &inputStr){
 			stack.push(mxc);
 		}
 		else if(inputStr[i].isDigit()){
-			int num = inputStr[i].toLatin1()-48;
+			double num = inputStr[i].toLatin1()-48;
 			while(inputStr[i+1].isDigit())
 				num = num*10+inputStr[++i].toLatin1()-48;
 			if(inputStr[i+1]=='.'){  //小數部分
-				int pointNum=(inputStr[++i].toLatin1()-48)/10;
+				i++;
+				double pointNum=0;
 				while(inputStr[i+1].isDigit())
-					pointNum = pointNum/10+inputStr[++i].toLatin1()-48;
+					pointNum = pointNum+(inputStr[++i].toLatin1()-48)/10.;
 				num+=pointNum;
 			}
 			MatXChar mxc;
@@ -97,7 +98,7 @@ Mat MainWindow::calc(QString &inputStr){
 			result.c=mxc1.c;
 			stack.push(result);
 		}
-		else if(inputStr[i]=='-'){
+		else if(inputStr[i]=='-'){	//負數?
 			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
 			if(mxc1.c!=mxc2.c) throw "Input Error!";
 			result.m=mxc1.m-mxc2.m;
@@ -107,20 +108,21 @@ Mat MainWindow::calc(QString &inputStr){
 
 		else if(inputStr[i]=='*'){
 			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
-			if(mxc1.c!=mxc2.c){  //c不相同
-				if(mxc1.c=='C'){
+			int r1=mxc1.m.getRow(),r2=mxc2.m.getRow(),c1=mxc1.m.getCol(),c2=mxc2.m.getCol();
+			if(r1!=r2||c1!=c2){  //c不相同
+				if(r1==1&&c1==1){
 					result.m = mxc2.m * mxc1.m.getRowData(0).getData(0);
 					result.c = mxc2.c;
 				}
-				else if(mxc2.c=='C'){
+				else if(r2==1&&c2==1){
 					result.m =  mxc2.m.getRowData(0).getData(0) * mxc1.m;
 					result.c = mxc1.c;
 				}
-				else if(mxc1.c=='V'){
+				else if(r1==1){
 					result.m =  mxc2.m * mxc1.m.trans();
 					result.c = 'M';
 				}
-				else if(mxc2.c=='V'){
+				else if(r2==1){
 					result.m =  mxc2.m * mxc1.m;
 					result.c = 'M';
 				}
@@ -128,15 +130,15 @@ Mat MainWindow::calc(QString &inputStr){
 					throw "Input Error!";
 			}
 			else{  //c都相同
-				if(mxc1.c=='V'){
-					result.m =  mxc2.m.trans() * mxc1.m;
+				if(r1==1){
+					result.m = mxc2.m * mxc1.m.trans();
 					result.c = 'C';
 				}
-				else if(mxc1.c=='M'){
+				else if(r1!=1||c1!=1){
 					result.m = mxc2.m * mxc1.m;
 					result.c = 'M';
 				}
-				else if(mxc1.c=='C'){
+				else if(r1==1&&c1==1){	//不能兩個常數運算
 					result.m = mxc2.m * mxc1.m;
 					result.c = 'C';
 				}
@@ -172,7 +174,8 @@ void MainWindow::on_pushButton_clicked()
 		if(inst=="print"){
 			args[0]=toPostfix(args[0]);
 			ui->textBrowser->append(s);
-			ui->textBrowser->append(QString::fromStdString(calc(s).toString()));
+			ui->textBrowser->append(args[0]);
+			ui->textBrowser->append(QString::fromStdString(calc(args[0]).toString()));
 		}
 		else if(inst=="info"){//顯示矩陣的資訊(行數列數)
 			args[0] = toPostfix(args[0]);
