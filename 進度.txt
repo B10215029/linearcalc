@@ -1,19 +1,19 @@
 ﻿向量			
-V	+	加法	
-V	*	內積	
-V	*	scalar	
-V	Norm	長度	
-V	Normal	單位向量	
-V	Cross	外積	
-V	Com	投影向量的長度	
-V	Proj	投影向量	
+V  V	+	加法	
+V  V	*	內積	
+V  V	*	scalar	
+V  V	Norm	長度	
+V  V	Normal	單位向量	
+V  V	Cross	外積	
+V  V	Com	投影向量的長度	
+V  V	Proj	投影向量	
 	Area	Triangle area	
-V	isPara	是否平行	
-V	isOrth	是否垂直	
-V	Angle	The angle between two vectors 	
-V	pN	Plane normal	
+V  V	isPara	是否平行	
+V  V	isOrth	是否垂直	
+V  V	Angle	The angle between two vectors 	
+V  V	pN	Plane normal	
 	IsLI	Linear independent judgement	
-V	Ob	Find orthonormal basis of the basis	
+V  V	Ob	Find orthonormal basis of the basis	
 矩陣			
 	+	加法	
 	-	減法	
