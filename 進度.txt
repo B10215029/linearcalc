@@ -12,18 +12,18 @@ V  V	isPara	是否平行
 V  V	isOrth	是否垂直	
 V  V	Angle	The angle between two vectors 	
 V  V	pN	Plane normal	
-V	IsLI	Linear independent judgement	
+V  V	IsLI	Linear independent judgement	
 V  V	Ob	Find orthonormal basis of the basis	
 矩陣			
 V  V	+	加法	
 V  V	-	減法	
 V  V	*	乘法	
 V  V	Rank	Rank	
-V	Trans	轉置	
-V	/	ax=b;x=a/b	
-V	Det	行列式	
-V	Inv	反矩陣	
-V	Adj	Adjoint Matrix	
+V  V	Trans	轉置	
+V  V	/	ax=b;x=a/b	
+V  V	Det	行列式	
+V  V	Inv	反矩陣	
+V  V	Adj	Adjoint Matrix	
 	Eigen	特徵向量與特徵數	
 	PM	Power Method of Eigen value	?
 V  V	LS	Method of Least Square	?
