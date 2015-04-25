@@ -59,7 +59,7 @@ Mat MainWindow::calc(QString &inputStr){
 			//Latin-1編碼前127字類似Ascii
 			MatXChar mxc;
 			int indexOffset=-65;
-			while(inputStr[++i]=='Z')
+			while(inputStr[++i]=='Z') //VZA=v[25]
 				indexOffset+=25;
 			mxc.m=Mat(v[inputStr[i].toLatin1()+indexOffset]);
 			mxc.c='V';
@@ -76,13 +76,13 @@ Mat MainWindow::calc(QString &inputStr){
 		}
 		else if(inputStr[i].isDigit()){
 			double num = inputStr[i].toLatin1()-48;
-			while(inputStr[i+1].isDigit())
+			while(inputStr[i+1].isDigit())  //整數部分
 				num = num*10+inputStr[++i].toLatin1()-48;
 			if(inputStr[i+1]=='.'){  //小數部分
 				i++;
 				double pointNum=0;
 				while(inputStr[i+1].isDigit())
-					pointNum = pointNum+(inputStr[++i].toLatin1()-48)/10.;
+					pointNum += (inputStr[++i].toLatin1()-48)/10.;
 				num+=pointNum;
 			}
 			MatXChar mxc;
@@ -109,7 +109,7 @@ Mat MainWindow::calc(QString &inputStr){
 		else if(inputStr[i]=='*'){
 			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
 			int r1=mxc1.m.getRow(),r2=mxc2.m.getRow(),c1=mxc1.m.getCol(),c2=mxc2.m.getCol();
-			if(r1!=r2||c1!=c2){  //c不相同
+			if((r1!=r2||c1!=c2) && mxc1.c!='M'){
 				if(r1==1&&c1==1){
 					result.m = mxc2.m * mxc1.m.getRowData(0).getData(0);
 					result.c = mxc2.c;
@@ -122,14 +122,14 @@ Mat MainWindow::calc(QString &inputStr){
 					result.m =  mxc2.m * mxc1.m.trans();
 					result.c = 'M';
 				}
-				else if(r2==1){
-					result.m =  mxc2.m * mxc1.m;
-					result.c = 'M';
-				}
+//				else if(r2==1){
+//					result.m =  mxc2.m * mxc1.m;
+//					result.c = 'M';
+//				}
 				else
 					throw "Input Error!";
 			}
-			else{  //c都相同
+			else{
 				if(r1==1){
 					result.m = mxc2.m * mxc1.m.trans();
 					result.c = 'C';
@@ -138,10 +138,10 @@ Mat MainWindow::calc(QString &inputStr){
 					result.m = mxc2.m * mxc1.m;
 					result.c = 'M';
 				}
-				else if(r1==1&&c1==1){	//不能兩個常數運算
-					result.m = mxc2.m * mxc1.m;
-					result.c = 'C';
-				}
+//				else if(r1==1&&c1==1){	//不能兩個常數運算
+//					result.m = mxc2.m * mxc1.m;
+//					result.c = 'C';
+//				}
 			}
 			stack.push(result);
 		}
@@ -167,12 +167,12 @@ void MainWindow::on_pushButton_clicked()
 	for(int i=1;i<args.size();++i)
 		s+=args[i];
 	s=s.toUpper();
-	args = s.split(',');//其實我不太懂分開逗號要幹嘛，等你寫
+	args = s.split(',');
 
 	try{
 		/////通用指令/////
 		if(inst=="print"){
-			args[0]=toPostfix(args[0]);//args[0]有再用到?
+			args[0]=toPostfix(args[0]);
 			ui->textBrowser->append(s);
 			ui->textBrowser->append(QString::fromStdString(calc(args[0]).toString()));
 		}
@@ -180,7 +180,7 @@ void MainWindow::on_pushButton_clicked()
 			args[0] = toPostfix(args[0]);
 			Mat m = calc(args[0]);
 			ui->textBrowser->append(QString("%1 Row:%2 Col:%3 First data:%4").arg(args[0]).arg(m.getRow()).
-					arg(m.getCol()).arg(m.getRowData(0).getData(0)));//m.getRowData(0).getData(0) 只有1個
+					arg(m.getCol()).arg(m.getRowData(0).getData(0)));
 		}
 		else if(inst=="new"){//手動新增變數(格式如輸入檔案)(沒有輸入錯誤的判斷)
 			args= inputStr.split(' ');//用空白隔開方便輸入
