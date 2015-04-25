@@ -352,66 +352,50 @@ Mat Mat::SolveSquareLinearSys(const Mat& b){
 	}
 	return x;
 }
-#define a poly[2]
-#define b poly[1]
-#define c poly[0]
-#define Q (pow(a,2)-3*b)/9
-#define R (2*pow(a,3)-9*a*b+27*c)/54
-#define theta acos(R/pow(Q,3/2))
-#define Qcos(x) -2*pow(Q,0.5)*cos((theta+x)/3)-a/3
-//double Qcos(double x,double a, double Q,double theta){
-//	return -2*pow(Q,0.5)*cos((theta+x)/3)-a/3;
-//}
+#define _a poly[2]
+#define _b poly[1]
+#define _c poly[0]
+#define _Q ((pow(_a,2)-3*_b)/9)
+#define _R ((2*pow(_a,3)-9*_a*_b+27*_c)/54)
+#define _theta (acos(_R/pow(_Q,1.5)))
+#define _Qcos(x) -2*pow(_Q,0.5)*cos((_theta+x)/3)-_a/3
 void Mat::eigen3(Mat& vecs,Vec& vals){
 	if(row!=col || row>3) throw "eigen3失敗，維度不同!";
 	if(row==3){
 		double poly[3];//x^3+a*x^2+b*x+c=0
 		Vec eigenValues(row);
 		vals=eigenValues;
-		poly[0]=-data[0][0]*data[1][1]*data[2][2]
-				+data[0][1]*data[1][2]*data[2][0]
-				+data[0][2]*data[1][0]*data[2][1]
-
-				-data[0][2]*data[1][1]*data[2][0]
-				-data[0][0]*data[1][2]*data[2][1]
-				-data[0][1]*data[1][0]*data[2][2];
-		poly[1]=data[0][0]*data[1][1]+data[0][0]*data[2][2]+data[1][1]*data[2][2]+
-				data[0][2]*data[2][0]+
-				data[1][2]*data[2][1]+
+		poly[0]=-det();
+		poly[1]=data[0][0]*data[1][1]+data[0][0]*data[2][2]+data[1][1]*data[2][2]-
+				data[0][2]*data[2][0]-
+				data[1][2]*data[2][1]-
 				data[0][1]*data[1][0];
 		poly[2]=-data[0][0]-data[1][1]-data[2][2];
 
-//		double a=poly[2],
-//		b=poly[1],
-//		c=poly[0],
-//		Q=(pow(a,2)-3*b)/9,
-//		R=(2*pow(a,3)-9*a*b+27*c)/54,
-//		theta=acos(R/pow(Q,1.5));
+		poly[2]=-6;
+		poly[1]=12;
+		poly[0]=-8;
 
-		vals.setData(Qcos(0),0);
-		vals.setData(Qcos(2*M_PI),1);
-		vals.setData(Qcos(-2*M_PI),2);
+		vals.setData(_Qcos(0),0);
+		vals.setData(_Qcos(2*M_PI),1);
+		vals.setData(_Qcos(-2*M_PI),2);
 
-//		vals.setData(poly[0],0);
-//		vals.setData(poly[1],1);
-//		vals.setData(poly[2],2);
-
-		Mat zero(col,1),a_l,eigenVectors(row,col);
+		Mat a_l,eigenVectors(row,col);
 		vecs=eigenVectors;
-		for(int i=0;i<3;i++){
+		for(int i=0;i<row;i++){
 			a_l=*this;
 			for(int j=0;j<row;j++)
-				a_l.data[j][j]-=poly[i];
+				a_l.data[j][j]-=vals.getData(i);
 			a_l.GaussJordanRowReduction();
-			for(int ii=row-1;ii>=0;ii--){
+			for(int j=row-1;j>=0;j--){
 				double sum=0;
-				if(a_l.data[ii][ii]==0){
-					vecs.data[i][ii]=1;
+				if(a_l.data[j][j]==0){
+					vecs.data[j][i]=1;
 					continue;
 				}
-				for(int j=ii+1;j<col;j++)
-					sum+=a_l.data[ii][j]*vecs.data[i][ii];
-				vecs.data[i][ii]=(zero.data[ii][0]-sum)/a_l.data[ii][ii];
+				for(int k=j+1;k<col;k++)
+					sum+=a_l.data[j][k]*vecs.data[k][i];
+				vecs.data[j][i]=(0-sum);
 			}
 		}
 	}
@@ -419,12 +403,32 @@ void Mat::eigen3(Mat& vecs,Vec& vals){
 		Vec eigenValues(row);
 		vals=eigenValues;
 		double poly[2];//x^2+b*x+c=0
-		poly[0]=-data[0][0]*data[1][1]-data[0][1]*data[1][0];
-		poly[1]=data[0][0]+data[1][1]-data[0][1]*data[1][0];
-#define quadric0 (-b+pow(pow(b,2)-4*c,0.5))/2
-#define quadric1 (-b-pow(pow(b,2)-4*c,0.5))/2
+		poly[0]=det();
+		poly[1]=-data[0][0]-data[1][1];
+#define quadric0 (-_b+pow(pow(_b,2)-4*_c,0.5))/2
+#define quadric1 (-_b-pow(pow(_b,2)-4*_c,0.5))/2
 		vals.setData(quadric0,0);
 		vals.setData(quadric1,1);
+
+		Mat a_l,eigenVectors(row,col);
+		vecs=eigenVectors;
+		for(int i=0;i<row;i++){
+			a_l=*this;
+			for(int j=0;j<row;j++)
+				a_l.data[j][j]-=vals.getData(i);
+			a_l.GaussJordanRowReduction();
+			//vecs=a_l;
+			for(int j=row-1;j>=0;j--){
+				double sum=0;
+				if(a_l.data[j][j]==0){
+					vecs.data[j][i]=1;
+					continue;
+				}
+				for(int k=j+1;k<col;k++)
+					sum+=a_l.data[j][k]*vecs.data[k][i];
+				vecs.data[j][i]=(0-sum);
+			}
+		}
 	}
 }
 int Mat::Rank(){
@@ -457,7 +461,7 @@ Mat Mat::LS(Mat& v){
 double Mat::PowerMethod(Vec& xn){
 	if(row!=col) throw "PowerMethod失敗，not square matrix!";
 	double lambda;
-	Vec initVec(row),lastVec;
+	Vec initVec(row);//,lastVec;
 	xn=initVec;
 	xn.setI();
 //	do{
