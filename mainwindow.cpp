@@ -478,8 +478,12 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 void MainWindow::on_pushButton_10_clicked()//未定義
 {
 	try{
-		ui->textBrowser->append(QString("%1").arg(m[2].Rank()));
-		ui->textBrowser->append(QString::fromStdString(m[2].toString()));
+//		ui->textBrowser->append(QString("%1").arg(m[2].Rank()));
+//		ui->textBrowser->append(QString::fromStdString(m[2].toString()));
+		ui->textBrowser->append(QString::fromStdString(m[0].LS(m[1]).toString()));
+		ui->textBrowser->append(QString::fromStdString(m[2].LS(m[3]).toString()));
+		ui->textBrowser->append(QString::fromStdString(m[4].LS(m[5]).toString()));
+		ui->textBrowser->append(QString::fromStdString(m[6].LS(m[7]).toString()));
 	}
 	catch(const char* e){
 		ui->textBrowser->append(e);

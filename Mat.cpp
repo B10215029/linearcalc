@@ -428,6 +428,9 @@ int Mat::Rank(){
 		r+=!(EQU(m.data[i][i],0));
 	return r;
 }
+Mat Mat::LS(Mat& v){
+	return (trans()*(*this)).Inverse()*trans()*v;
+}
 std::string Mat::toString(){
 	std::ostringstream out;
 	for(int i=0;i<row;i++){
