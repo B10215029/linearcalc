@@ -167,20 +167,20 @@ void MainWindow::on_pushButton_clicked()
 	for(int i=1;i<args.size();++i)
 		s+=args[i];
 	s=s.toUpper();
-	args = s.split(',');
+	args = s.split(',');//其實我不太懂分開逗號要幹嘛，等你寫
 
 	try{
 		/////通用指令/////
 		if(inst=="print"){
-			args[0]=toPostfix(args[0]);
+			args[0]=toPostfix(args[0]);//args[0]有再用到?
 			ui->textBrowser->append(s);
-			ui->textBrowser->append(args[0]);
 			ui->textBrowser->append(QString::fromStdString(calc(args[0]).toString()));
 		}
 		else if(inst=="info"){//顯示矩陣的資訊(行數列數)
 			args[0] = toPostfix(args[0]);
 			Mat m = calc(args[0]);
-			ui->textBrowser->append(QString("%1 Row:%2 Col:%3 First data:%4").arg(args[0]).arg(m.getRow()).arg(m.getCol()).arg(m.getRowData(0).getData(0)));
+			ui->textBrowser->append(QString("%1 Row:%2 Col:%3 First data:%4").arg(args[0]).arg(m.getRow()).
+					arg(m.getCol()).arg(m.getRowData(0).getData(0)));//m.getRowData(0).getData(0) 只有1個
 		}
 		else if(inst=="new"){//手動新增變數(格式如輸入檔案)(沒有輸入錯誤的判斷)
 			args= inputStr.split(' ');//用空白隔開方便輸入
@@ -189,7 +189,6 @@ void MainWindow::on_pushButton_clicked()
 				for(int i=0;i<vv.getDim();i++)
 					vv.setData(args[3+i].toDouble(),i);
 				v.push_back(vv);
-				//這行解釋在OpenFile
 				ui->comboBox->addItem(QString("V%1").arg(QString("Z").repeated((v.size()-1)/25)+(97+((v.size()-1)%25))));
 				ui->textBrowser->append(QString("new %1").arg(ui->comboBox->itemText(ui->comboBox->count()-1)));
 			}
