@@ -50,7 +50,7 @@ public:
 	void LU(Mat& l,Mat& u,int& swapCount);//type1 row reduction
 	bool IsLI();
 	Mat SolveSquareLinearSys(const Mat& b);
-	void eigen(Mat& vecs,Vec& vals);
+	void eigen3(Mat& vecs,Vec& vals);
 ////////// ////////// ////////// //////////
 	std::string toString();
 };

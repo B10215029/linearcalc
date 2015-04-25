@@ -424,8 +424,38 @@ Mat Mat::SolveSquareLinearSys(const Mat& b){
 	}
 	return x;
 }
-void Mat::eigen(Mat& vecs,Vec& vals){
+void Mat::eigen3(Mat& vecs,Vec& vals){
+	if(row!=col || row!=3) throw "eigen3失敗，維度不同!";
+	if(row==3){
+		double poly[3],Q,R,theta;//-x^3+c2*x^2+c1*x+c0=0
+		poly[0]=-det();
+		poly[1]=data[0][0]+data[1][1]+data[2][2]-
+				data[0][2]*data[2][0]-
+				data[1][2]*data[2][1]-
+				data[0][1]*data[1][0];
+		poly[2]=-data[0][0]-data[1][1]-data[2][2];
 
+		Q=(pow(poly[2],2)-3*poly[1])/9;
+		R=(pow(poly[2],3)-9*poly[2]*poly[1]+27*poly[0])/54;
+		theta=acos(R/pow(Q,3/2));
+		#define Qcos(x) -2*pow(Q,0.5)*cos((theta+x)/3)-poly[2]/3
+
+		vals.setData(Qcos(0),0);
+		vals.setData(Qcos(2*M_PI),1);
+		vals.setData(Qcos(-2*M_PI),2);
+
+		Mat zero(col,1),u;
+		for(int i=0;i<3;i++){
+			u=*this;
+			for(int j=0;j<row;j++)
+				u.data[j][j]-=poly[i];
+			Mat v=u.SolveSquareLinearSys(zero);
+			vecs;
+		}
+	}
+	else if(row==2){
+
+	}
 }
 std::string Mat::toString(){
 	std::ostringstream out;
