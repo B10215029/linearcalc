@@ -277,42 +277,6 @@ Mat Mat::Inverse(){
 	if(u!=iden) throw "沒有Inverse!";
 	return p;
 }
-//void Mat::LU(Mat& p,Mat& l,Mat& u){
-//	if(row!=col) throw "LU失敗，not square matrix!";
-//	p=Mat::identity(row);
-//	l=Mat::zeroSquare(row);
-//	u=Mat::identity(row);
-//	for(int i=0;i<row;i++){ //change order of this matrix
-//		int max=i;
-//		for(int j=i+1;j<row;j++)
-//			if(data[max][i]<data[j][i])
-//				max=j;
-//		p.swapRow(i,max);
-//	}
-//	Mat pa=p**this;
-
-//	for(int i=0;i<row;i++){ //directly assign
-//		for(int j=0;j<row;j++){
-//			double s=0;
-
-//			if(i<=j){
-//				for(int k=0;k<i;k++){
-//					if(k==i) continue;
-//					s+=l.data[i][k]*u.data[k][j];
-//				}
-//				u.data[i][j]=(pa.data[i][j]-s)/l.data[i][i];
-//			}
-//			else if(i>j){
-//				for(int k=0;k<j;k++){
-//					if(k==j) continue;
-//					s+=l.data[i][k]*u.data[k][j];
-//				}
-//				l.data[i][j]=(pa.data[i][j]-s)/u.data[j][j];
-//			}
-
-//		}
-//	}
-//}
 void Mat::LU(Mat& l,Mat& u,int& swapCount){
 	if(row!=col) throw "LU失敗，not square matrix!";
 	//type1 row reduction

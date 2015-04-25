@@ -15,10 +15,10 @@ V  V	pN	Plane normal
 V	IsLI	Linear independent judgement	
 V  V	Ob	Find orthonormal basis of the basis	
 矩陣			
-V	+	加法	
-V	-	減法	
-V	*	乘法	
-V	Rank	Rank	
+V  V	+	加法	
+V  V	-	減法	
+V  V	*	乘法	
+V  V	Rank	Rank	
 V	Trans	轉置	
 V	/	ax=b;x=a/b	
 V	Det	行列式	

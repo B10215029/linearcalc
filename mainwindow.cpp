@@ -244,7 +244,12 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(QString::fromStdString(v1.proj(v2).toString()));
 		}
 		else if(inst=="area"){
-			ui->textBrowser->append("coming soon!");
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			args[1] = toPostfix(args[1]);
+			Vec v1 = calc(args[0]).getRowData(0);
+			Vec v2 = calc(args[1]).getRowData(0);
+			ui->textBrowser->append(QString("%1").arg(v1.Area(v2)));
 		}
 		else if(inst=="ispara"){
 			ui->textBrowser->append(inputStr);
@@ -279,25 +284,97 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(QString::fromStdString(v1.planeNormal(v2).toString()));
 		}
 		else if(inst=="isli"){
-			ui->textBrowser->append("coming soon!");
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			Vec vi = calc(args[0]).getRowData(0);
+			Vec *va=new Vec[vi.getDim()];
+			va[0]=vi;
+			for(int i=1;i<vi.getDim();i++){
+				args[0] = toPostfix(args[0]);
+				va[i]=calc(args[i]).getRowData(0);
+			}
+			Mat mm(va,vi.getDim(),vi.getDim());
+			ui->textBrowser->append(mm.IsLI()?"Yes":"No");
 		}
 		else if(inst=="ob"){
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			Vec vi = calc(args[0]).getRowData(0);
-			Vec *v=new Vec[vi.getDim()];
-			v[0]=vi;
+			Vec *va=new Vec[vi.getDim()];
+			va[0]=vi;
 			for(int i=1;i<vi.getDim();i++){
 				args[0] = toPostfix(args[0]);
-				v[i]=calc(args[i]).getRowData(0);
+				va[i]=calc(args[i]).getRowData(0);
 			}
-			Vec::ob(v);
+			Vec::ob(va);
 			for(int i=0;i<vi.getDim();i++){
-				ui->textBrowser->append(QString::fromStdString(v[i].toString()));
+				ui->textBrowser->append(QString::fromStdString(va[i].toString()));
 			}
 		}
 		/////矩陣指令/////
+		else if(inst=="rank"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			Mat mm = calc(args[0]);
+			ui->textBrowser->append(QString("%1").arg(mm.Rank()));
+		}
+		else if(inst=="trans"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			Mat mm = calc(args[0]);
+			ui->textBrowser->append(QString::fromStdString(mm.trans().toString()));
+		}
+		else if(inst=="ssl"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			args[1] = toPostfix(args[1]);
+			Mat m1 = calc(args[0]);
+			Mat m2 = calc(args[1]);
+			ui->textBrowser->append(QString::fromStdString(m1.SolveSquareLinearSys(m2).toString()));
+		}
+		else if(inst=="det"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			Mat mm = calc(args[0]);
+			ui->textBrowser->append(QString("%1").arg(mm.det()));
+		}
+		else if(inst=="inv"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			Mat mm = calc(args[0]);
+			ui->textBrowser->append(QString::fromStdString(mm.Inverse().toString()));
+		}
+		else if(inst=="adj"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			Mat mm = calc(args[0]);
+			ui->textBrowser->append(QString::fromStdString(mm.Adj().toString()));
+		}
+		else if(inst=="eigen"){
 
+		}
+		else if(inst=="pm"){
+
+		}
+		else if(inst=="ls"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			args[1] = toPostfix(args[1]);
+			Mat m1 = calc(args[0]);
+			Mat m2 = calc(args[1]);
+			ui->textBrowser->append(QString::fromStdString(m1.LS(m2).toString()));
+		}
+		else if(inst=="rref"){
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			Mat mm = calc(args[0]);
+			Mat l;
+			Mat u;
+			int a;
+			mm.LU(l,u,a);
+			ui->textBrowser->append(QString::fromStdString(l.toString()));
+			ui->textBrowser->append(QString::fromStdString(u.toString()));
+		}
 		/////其他/////
 		else
 			ui->textBrowser->append("No such instructions!");
