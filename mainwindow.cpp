@@ -92,7 +92,7 @@ Mat MainWindow::calc(QString &inputStr){
 		}
 
 		else if(inputStr[i]=='+'){
-			if(stack.size()<2) throw "POwOq";//!!?
+			if(stack.size()<2) throw "powoq";//00
 			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
 			if(mxc1.c!=mxc2.c) throw "Input Error!";
 			result.m=mxc1.m+mxc2.m;
@@ -100,7 +100,7 @@ Mat MainWindow::calc(QString &inputStr){
 			stack.push(result);
 		}
 		else if(inputStr[i]=='-'){	//負數?
-			if(stack.size()<2) throw "POwOq";
+			if(stack.size()<2) throw "PowOq";//01
 			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
 			if(mxc1.c!=mxc2.c) throw "Input Error!";
 			result.m=mxc1.m-mxc2.m;
@@ -109,7 +109,7 @@ Mat MainWindow::calc(QString &inputStr){
 		}
 
 		else if(inputStr[i]=='*'){
-			if(stack.size()<2) throw "POwOq";//!!?
+			if(stack.size()<2) throw "POwoq";//10
 			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
 			int r1=mxc1.m.getRow(),r2=mxc2.m.getRow(),c1=mxc1.m.getCol(),c2=mxc2.m.getCol();
 			if((r1!=r2||c1!=c2) && mxc1.c!='M'){
@@ -150,7 +150,7 @@ Mat MainWindow::calc(QString &inputStr){
 		}
 
 		else if(inputStr[i]=='/'){
-			if(stack.size()<2) throw "POwOq";//!!?
+			if(stack.size()<2) throw "pOwOq";//11
 			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
 			if(mxc1.c=='C'){
 				result.m = mxc2.m / mxc1.m.getRowData(0).getData(0);
@@ -160,7 +160,7 @@ Mat MainWindow::calc(QString &inputStr){
 			stack.push(result);
 		}
 	}
-	if(stack.size()<1) throw "POwOq";//!!?
+	if(stack.size()<1) throw "poWoq";//100
 	return stack.pop().m;
 }
 
@@ -604,13 +604,13 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 //		ui->textBrowser->append(QString::fromStdString(vv.toString())+"\n");
 //		ui->textBrowser->append(QString::fromStdString(eiV.toString())+"\n");
 /////////////////////////////////////
-		Vec x;
-		ui->textBrowser->append(QString::number(m[0].PowerMethod(x))+"\n");
-		ui->textBrowser->append(QString::fromStdString(x.toString())+"\n");
-		ui->textBrowser->append(QString::number(m[1].PowerMethod(x))+"\n");
-		ui->textBrowser->append(QString::fromStdString(x.toString())+"\n");
-		ui->textBrowser->append(QString::number(m[2].PowerMethod(x))+"\n");
-		ui->textBrowser->append(QString::fromStdString(x.toString())+"\n");
+//		Vec x;
+//		ui->textBrowser->append(QString::number(m[0].PowerMethod(x))+"\n");
+//		ui->textBrowser->append(QString::fromStdString(x.toString())+"\n");
+//		ui->textBrowser->append(QString::number(m[1].PowerMethod(x))+"\n");
+//		ui->textBrowser->append(QString::fromStdString(x.toString())+"\n");
+//		ui->textBrowser->append(QString::number(m[2].PowerMethod(x))+"\n");
+//		ui->textBrowser->append(QString::fromStdString(x.toString())+"\n");
 	}
 	catch(const char* e){
 		ui->textBrowser->append(e);
