@@ -352,30 +352,20 @@ Mat Mat::SolveSquareLinearSys(const Mat& b){
 	}
 	return x;
 }
-#define _a poly[2]
-#define _b poly[1]
-#define _c poly[0]
-#define _Q ((pow(_a,2)-3*_b)/9)
-#define _R ((2*pow(_a,3)-9*_a*_b+27*_c)/54)
-#define _theta (acos(_R/pow(_Q,1.5)))
-#define _Qcos(x) -2*pow(_Q,0.5)*cos((_theta+x)/3)-_a/3
 void Mat::eigen3(Mat& vecs,Vec& vals){
 	if(row!=col || row>3) throw "eigen3失敗，維度不同!";
 	if(row==3){
 		Mat rm(col,col);
 		Vec eigenVal(col);
-		double ta=-data[0][0]-data[1][1]-data[2][2];
-		double tb=
-		 data[0][0]*data[1][1]
-		+data[1][1]*data[2][2]
-		+data[2][2]*data[0][0]
-		-data[0][1]*data[1][0]
-		-data[0][2]*data[2][0]
-		-data[1][2]*data[2][1];
-		double tc=-det();
-		double tQ=(ta*ta-3*tb)/9;
-		double tR=(2*ta*ta*ta-9*ta*tb+27*tc)/54;
-		double tT;
+		double ta=-data[0][0]-data[1][1]-data[2][2],
+				tb=data[0][0]*data[1][1]+data[1][1]*data[2][2]+data[2][2]*data[0][0]
+				-data[0][1]*data[1][0]
+				-data[0][2]*data[2][0]
+				-data[1][2]*data[2][1],
+				tc=-det(),
+				tQ=(ta*ta-3*tb)/9,
+				tR=(2*ta*ta*ta-9*ta*tb+27*tc)/54,
+				tT;
 		if(tR*tR<tQ*tQ*tQ)
 			tT=acos(tR/sqrt(tQ*tQ*tQ));
 		else if(EQU(tR,0)&&EQU(tQ,0))
@@ -404,6 +394,8 @@ void Mat::eigen3(Mat& vecs,Vec& vals){
 		double poly[2];//x^2+b*x+c=0
 		poly[0]=det();
 		poly[1]=-data[0][0]-data[1][1];
+#define _b poly[1]
+#define _c poly[0]
 #define quadric0 (-_b+pow(pow(_b,2)-4*_c,0.5))/2
 #define quadric1 (-_b-pow(pow(_b,2)-4*_c,0.5))/2
 		vals.setData(quadric0,0);
@@ -459,20 +451,11 @@ Mat Mat::LS(Mat& v){
 double Mat::PowerMethod(Vec& xn){
 	if(row!=col) throw "PowerMethod失敗，not square matrix!";
 	double lambda;
-	Vec initVec(row);//,lastVec;
+	Vec initVec(row);
 	xn=initVec;
 	xn.setI();
-//	do{
-	for(int i=0;i<9999;i++){
-//		lastVec=xn;
-//		Mat t=(*this)*(Mat(xn).trans());
-//		xn=t.getColData(0).normal();
+	for(int i=0;i<19999;i++)
 		xn=(*this*xn).getColData(0).normal();
-	}
-//	}while(EQU((lastVec-xn).norm(),0));
-//	Mat axn=(*this)*(Mat(xn).trans());
-//	Vec vaxn=axn.getColData(0);
-//	lambda=(vaxn*xn)/(xn*xn);
 	lambda=(*this*xn).getColData(0)*xn/(xn*xn);
 	return lambda;
 }
