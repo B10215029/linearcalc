@@ -372,9 +372,9 @@ void Mat::eigen3(Mat& vecs,Vec& vals){
 				data[0][1]*data[1][0];
 		poly[2]=-data[0][0]-data[1][1]-data[2][2];
 
-		poly[2]=-6;
-		poly[1]=12;
-		poly[0]=-8;
+//		poly[2]=-6;
+//		poly[1]=12;
+//		poly[0]=-8;
 
 		vals.setData(_Qcos(0),0);
 		vals.setData(_Qcos(2*M_PI),1);
@@ -417,7 +417,6 @@ void Mat::eigen3(Mat& vecs,Vec& vals){
 			for(int j=0;j<row;j++)
 				a_l.data[j][j]-=vals.getData(i);
 			a_l.GaussJordanRowReduction();
-			//vecs=a_l;
 			for(int j=row-1;j>=0;j--){
 				double sum=0;
 				if(a_l.data[j][j]==0){

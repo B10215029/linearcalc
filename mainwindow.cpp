@@ -92,7 +92,7 @@ Mat MainWindow::calc(QString &inputStr){
 		}
 
 		else if(inputStr[i]=='+'){
-			if(stack.size()<2) throw "POwOq";
+			if(stack.size()<2) throw "POwOq";//!!?
 			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
 			if(mxc1.c!=mxc2.c) throw "Input Error!";
 			result.m=mxc1.m+mxc2.m;
@@ -109,7 +109,7 @@ Mat MainWindow::calc(QString &inputStr){
 		}
 
 		else if(inputStr[i]=='*'){
-			if(stack.size()<2) throw "POwOq";
+			if(stack.size()<2) throw "POwOq";//!!?
 			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
 			int r1=mxc1.m.getRow(),r2=mxc2.m.getRow(),c1=mxc1.m.getCol(),c2=mxc2.m.getCol();
 			if((r1!=r2||c1!=c2) && mxc1.c!='M'){
@@ -150,7 +150,7 @@ Mat MainWindow::calc(QString &inputStr){
 		}
 
 		else if(inputStr[i]=='/'){
-			if(stack.size()<2) throw "POwOq";
+			if(stack.size()<2) throw "POwOq";//!!?
 			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
 			if(mxc1.c=='C'){
 				result.m = mxc2.m / mxc1.m.getRowData(0).getData(0);
@@ -160,7 +160,7 @@ Mat MainWindow::calc(QString &inputStr){
 			stack.push(result);
 		}
 	}
-	if(stack.size()<1) throw "POwOq";
+	if(stack.size()<1) throw "POwOq";//!!?
 	return stack.pop().m;
 }
 
