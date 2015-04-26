@@ -165,7 +165,7 @@ Vec Vec::proj(Vec& v){//----Projection
 	return re;
 }
 double Vec::Area(Vec& v){
-	return cross3_norm(v)/2;
+	return (norm()*v.norm()*sin(angle_radian(v)))/2;
 }
 
 Vec Vec::cross3(const Vec& v){
