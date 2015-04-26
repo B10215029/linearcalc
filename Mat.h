@@ -56,6 +56,7 @@ public:
 	int Rank();
 	Mat LS(Mat& v);
 	double PowerMethod(Vec& xn);
+	Mat nullspace();
 ////////// ////////// ////////// //////////
 	std::string toString();
 };

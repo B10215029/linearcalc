@@ -377,11 +377,32 @@ void MainWindow::on_pushButton_clicked()
 			Mat mm = calc(args[0]);
 			ui->textBrowser->append(QString::fromStdString(mm.Adj().toString()));
 		}
+		else if(inst=="null"){
+			if(args.size()<1) throw "請輸入矩陣";
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			Mat mm = calc(args[0]);
+			ui->textBrowser->append(QString::fromStdString(mm.nullspace().toString()));
+		}
 		else if(inst=="eigen"){
-
+			if(args.size()<1) throw "請輸入矩陣";
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			Mat mm = calc(args[0]);
+			Vec ev;
+			Mat rm;
+			mm.eigen3(rm,ev);
+			ui->textBrowser->append(QString::fromStdString(rm.toString()));
+			ui->textBrowser->append(QString::fromStdString(ev.toString()));
 		}
 		else if(inst=="pm"){
-
+			if(args.size()<1) throw "請輸入矩陣";
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			Mat mm = calc(args[0]);
+			Vec ev;
+			ui->textBrowser->append(QString("%1").arg(mm.PowerMethod(ev)));
+			ui->textBrowser->append(QString::fromStdString(ev.toString()));
 		}
 		else if(inst=="ls"){
 			if(args.size()<2) throw "請輸入兩個矩陣";
