@@ -362,42 +362,41 @@ Mat Mat::SolveSquareLinearSys(const Mat& b){
 void Mat::eigen3(Mat& vecs,Vec& vals){
 	if(row!=col || row>3) throw "eigen3失敗，維度不同!";
 	if(row==3){
-		double poly[3];//x^3+a*x^2+b*x+c=0
-		Vec eigenValues(row);
-		vals=eigenValues;
-		poly[0]=-det();
-		poly[1]=data[0][0]*data[1][1]+data[0][0]*data[2][2]+data[1][1]*data[2][2]-
-				data[0][2]*data[2][0]-
-				data[1][2]*data[2][1]-
-				data[0][1]*data[1][0];
-		poly[2]=-data[0][0]-data[1][1]-data[2][2];
-
-		poly[2]=-6;
-		poly[1]=12;
-		poly[0]=-8;
-
-		vals.setData(_Qcos(0),0);
-		vals.setData(_Qcos(2*M_PI),1);
-		vals.setData(_Qcos(-2*M_PI),2);
-
-		Mat a_l,eigenVectors(row,col);
-		vecs=eigenVectors;
-		for(int i=0;i<row;i++){
-			a_l=*this;
-			for(int j=0;j<row;j++)
-				a_l.data[j][j]-=vals.getData(i);
-			a_l.GaussJordanRowReduction();
-			for(int j=row-1;j>=0;j--){
-				double sum=0;
-				if(a_l.data[j][j]==0){
-					vecs.data[j][i]=1;
-					continue;
-				}
-				for(int k=j+1;k<col;k++)
-					sum+=a_l.data[j][k]*vecs.data[k][i];
-				vecs.data[j][i]=(0-sum);
-			}
+		Mat rm(col,col);
+		Vec eigenVal(col);
+		double ta=-data[0][0]-data[1][1]-data[2][2];
+		double tb=
+		 data[0][0]*data[1][1]
+		+data[1][1]*data[2][2]
+		+data[2][2]*data[0][0]
+		-data[0][1]*data[1][0]
+		-data[0][2]*data[2][0]
+		-data[1][2]*data[2][1];
+		double tc=-det();
+		double tQ=(ta*ta-3*tb)/9;
+		double tR=(2*ta*ta*ta-9*ta*tb+27*tc)/54;
+		double tT;
+		if(tR*tR<tQ*tQ*tQ)
+			tT=acos(tR/sqrt(tQ*tQ*tQ));
+		else if(EQU(tR,0)&&EQU(tQ,0))
+			tT=acos(1);
+		else
+			return;
+		eigenVal.setData(-2*sqrt(tQ)*cos(tT/3)-ta/3,0);
+		eigenVal.setData(-2*sqrt(tQ)*cos((tT+2*M_PI)/3)-ta/3,1);
+		eigenVal.setData(-2*sqrt(tQ)*cos((tT-2*M_PI)/3)-ta/3,2);
+		for(int i=0;i<col;i++){
+			Mat nullMat=(identity(col)*eigenVal.getData(i)-(*this)).nullspace();
+			Vec eigenVec(col);
+			for(int j=0;j<col;j++)
+				for(int k=0;k<col;k++)
+					eigenVec.setData(eigenVec.getData(j)+nullMat.data[j][k],j);
+			eigenVec.normalize();
+			for(int j=0;j<col;j++)
+				rm.data[j][i]=eigenVec.getData(j);
 		}
+		vecs=rm;
+		vals=eigenVal;
 	}
 	else if(row==2){
 		Vec eigenValues(row);
@@ -537,43 +536,6 @@ Mat Mat::nullspace(){
 		if(!EQU(m.data[i][r],0))
 			for(int j=0;j<col;j++)
 					rm.data[r][j]-=m.data[i][j];
-	}
-	return rm;
-}
-Mat Mat::eigen3D(Vec &eigenVal){
-	Mat rm(col,col);
-	Vec ev(col);
-	eigenVal=ev;
-	double ta=-data[0][0]-data[1][1]-data[2][2];
-	double tb=
-	 data[0][0]*data[1][1]
-	+data[1][1]*data[2][2]
-	+data[2][2]*data[0][0]
-	-data[0][1]*data[1][0]
-	-data[0][2]*data[2][0]
-	-data[1][2]*data[2][1];
-	double tc=-det();
-	double tQ=(ta*ta-3*tb)/9;
-	double tR=(2*ta*ta*ta-9*ta*tb+27*tc)/54;
-	double tT;
-	if(tR*tR<tQ*tQ*tQ)
-		tT=acos(tR/sqrt(tQ*tQ*tQ));
-	else if(EQU(tR,0)&&EQU(tQ,0))
-		tT=acos(1);
-	else
-		return rm;
-	eigenVal.setData(-2*sqrt(tQ)*cos(tT/3)-ta/3,0);
-	eigenVal.setData(-2*sqrt(tQ)*cos((tT+2*M_PI)/3)-ta/3,1);
-	eigenVal.setData(-2*sqrt(tQ)*cos((tT-2*M_PI)/3)-ta/3,2);
-	for(int i=0;i<col;i++){
-		Mat nullMat=(identity(col)*eigenVal.getData(i)-(*this)).nullspace();
-		Vec eigenVec(col);
-		for(int j=0;j<col;j++)
-			for(int k=0;k<col;k++)
-				eigenVec.setData(eigenVec.getData(j)+nullMat.data[j][k],j);
-		eigenVec.normalize();
-		for(int j=0;j<col;j++)
-			rm.data[j][i]=eigenVec.getData(j);
 	}
 	return rm;
 }

@@ -390,7 +390,8 @@ void MainWindow::on_pushButton_clicked()
 			args[0] = toPostfix(args[0]);
 			Mat mm = calc(args[0]);
 			Vec ev;
-			Mat rm=mm.eigen3D(ev);
+			Mat rm;
+			mm.eigen3(rm,ev);
 			ui->textBrowser->append(QString::fromStdString(rm.toString()));
 			ui->textBrowser->append(QString::fromStdString(ev.toString()));
 		}
