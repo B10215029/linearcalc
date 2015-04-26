@@ -478,6 +478,105 @@ double Mat::PowerMethod(Vec& xn){
 	lambda=(*this*xn).getColData(0)*xn/(xn*xn);
 	return lambda;
 }
+Mat Mat::nullspace(){
+	Mat m(*this);
+	Mat rm=identity(m.col);
+	for(int i=0;i<m.row;i++){
+		int maxV=i;
+		for(int j=i+1;j<m.row;j++)
+			if(fabs(m.data[j][i])>fabs(m.data[maxV][i]))
+				maxV=j;
+		if(maxV!=i)
+			for(int j=i;j<m.col;j++){
+				double t=m.data[i][j];
+				m.data[i][j]=m.data[maxV][j];
+				m.data[maxV][j]=t;
+			}
+		if(m.data[i][i]==0)
+			continue;
+		for(int j=i+1;j<m.row;j++)
+			for(int k=m.col-1;k>=i;k--)
+				m.data[j][k]-=m.data[i][k]*m.data[j][i]/m.data[i][i];
+	}
+	for(int i=0;i<m.row;i++){
+		int r=0;
+		while(r<col){
+			if(!EQU(m.data[i][r],0))
+				break;
+			r++;
+		}
+		if(r==col)
+			continue;
+		if(!EQU(m.data[i][r],0))
+			for(int j=m.col-1;j>=r;j--)
+				m.data[i][j]/=m.data[i][r];
+	}
+	for(int i=m.row-1;i>=0;i--){
+		int r=0;
+		while(r<col){
+			if(!EQU(m.data[i][r],0))
+				break;
+			r++;
+		}
+		if(r==col)
+			continue;
+		if(!EQU(m.data[i][r],0))
+			for(int j=i-1;j>=0;j--)
+				for(int k=m.col-1;k>=r;k--)
+					m.data[j][k]-=m.data[i][k]*m.data[j][r];
+	}
+	for(int i=m.row-1;i>=0;i--){
+		int r=0;
+		while(r<col){
+			if(!EQU(m.data[i][r],0))
+				break;
+			r++;
+		}
+		if(r==col)
+			continue;
+		if(!EQU(m.data[i][r],0))
+			for(int j=0;j<col;j++)
+					rm.data[r][j]-=m.data[i][j];
+	}
+	return rm;
+}
+Mat Mat::eigen3D(Vec &eigenVal){
+	Mat rm(col,col);
+	Vec ev(col);
+	eigenVal=ev;
+	double ta=-data[0][0]-data[1][1]-data[2][2];
+	double tb=
+	 data[0][0]*data[1][1]
+	+data[1][1]*data[2][2]
+	+data[2][2]*data[0][0]
+	-data[0][1]*data[1][0]
+	-data[0][2]*data[2][0]
+	-data[1][2]*data[2][1];
+	double tc=-det();
+	double tQ=(ta*ta-3*tb)/9;
+	double tR=(2*ta*ta*ta-9*ta*tb+27*tc)/54;
+	double tT;
+	if(tR*tR<tQ*tQ*tQ)
+		tT=acos(tR/sqrt(tQ*tQ*tQ));
+	else if(EQU(tR,0)&&EQU(tQ,0))
+		tT=acos(1);
+	else
+		return rm;
+	eigenVal.setData(-2*sqrt(tQ)*cos(tT/3)-ta/3,0);
+	eigenVal.setData(-2*sqrt(tQ)*cos((tT+2*M_PI)/3)-ta/3,1);
+	eigenVal.setData(-2*sqrt(tQ)*cos((tT-2*M_PI)/3)-ta/3,2);
+	for(int i=0;i<col;i++){
+		Mat nullMat=(identity(col)*eigenVal.getData(i)-(*this)).nullspace();
+		Vec eigenVec(col);
+		for(int j=0;j<col;j++)
+			for(int k=0;k<col;k++)
+				eigenVec.setData(eigenVec.getData(j)+nullMat.data[j][k],j);
+		eigenVec.normalize();
+		for(int j=0;j<col;j++)
+			rm.data[j][i]=eigenVec.getData(j);
+	}
+	return rm;
+}
 std::string Mat::toString(){
 	std::ostringstream out;
 	for(int i=0;i<row;i++){

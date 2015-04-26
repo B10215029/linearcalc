@@ -56,6 +56,8 @@ public:
 	int Rank();
 	Mat LS(Mat& v);
 	double PowerMethod(Vec& xn);
+	Mat nullspace();
+	Mat eigen3D(Vec &eigenVal);
 ////////// ////////// ////////// //////////
 	std::string toString();
 };
