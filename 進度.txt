@@ -7,7 +7,7 @@ V  V	Normal	單位向量
 V  V	Cross	外積	
 V  V	Com	投影向量的長度	
 V  V	Proj	投影向量	
-	Area	Triangle area	
+V  V	Area	Triangle area	
 V  V	isPara	是否平行	
 V  V	isOrth	是否垂直	
 V  V	Angle	The angle between two vectors 	
