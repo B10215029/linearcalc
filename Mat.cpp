@@ -1,4 +1,5 @@
 ﻿#include "Mat.h"
+#include <iostream>
 
 void Mat::initData(int r,int c){
 	row=r;
@@ -196,7 +197,7 @@ void Mat::swapRow(int x,int y){
 	}
 }
 double Mat::cofactor(int r, int c){
-	return pow(-1,r+c)*minor_mat(r,c).det();
+	return pow(-1.,r+c)*minor_mat(r,c).det();
 }
 double Mat::det(){
 	if(row!=col)
@@ -222,7 +223,7 @@ double Mat::det(){
 	LU(l,u,swapCount);
 	for(int i=0;i<row;i++)
 		x*=u.data[i][i];
-	x*=pow(-1,swapCount);
+	x*=pow(-1.,swapCount);
 
 	//type2 cofactor
 //	for(int i=0;i<col;i++)
@@ -369,7 +370,7 @@ void Mat::eigen3(Mat& vecs,Vec& vals){
 		if(tR*tR<tQ*tQ*tQ)
 			tT=acos(tR/sqrt(tQ*tQ*tQ));
 		else if(EQU(tR,0)&&EQU(tQ,0))
-			tT=acos(1);
+			tT=acos(1.);
 		else
 			return;
 		eigenVal.setData(-2*sqrt(tQ)*cos(tT/3)-ta/3,0);
@@ -423,26 +424,33 @@ void Mat::eigen3(Mat& vecs,Vec& vals){
 }
 int Mat::Rank(){
 	Mat m(*this);
-	for(int i=0;i<m.row;i++){
-		int maxV=i;
-		for(int j=i+1;j<m.row;j++)
+	for(int i=0,nr=0;i<(m.row<m.col?m.row:m.col);i++){
+		int maxV=nr;
+		for(int j=nr+1;j<m.row;j++)
 			if(fabs(m.data[j][i])>fabs(m.data[maxV][i]))
 				maxV=j;
-		if(maxV!=i)
+		if(maxV!=nr)
 			for(int j=i;j<m.col;j++){
-				double t=m.data[i][j];
-				m.data[i][j]=m.data[maxV][j];
+				double t=m.data[nr][j];
+				m.data[nr][j]=m.data[maxV][j];
 				m.data[maxV][j]=t;
 			}
-		if(m.data[i][i]==0)
+		if(EQU(m.data[nr][i],0))
 			continue;
-		for(int j=i+1;j<m.row;j++)
+		for(int j=nr+1;j<m.row;j++)
 			for(int k=m.col-1;k>=i;k--)
-				m.data[j][k]-=m.data[i][k]*m.data[j][i]/m.data[i][i];
+				m.data[j][k]-=m.data[nr][k]*m.data[j][i]/m.data[nr][i];
+		nr++;
 	}
+	std::cout<<m.toString()<<std::endl;
 	int r=0;
-	for(int i=0;i<m.row;i++)
-		r+=!(EQU(m.data[i][i],0));
+	for(int i=0;i<m.row;i++){
+		int j;
+		for(j=0;j<m.col;j++)
+			if(!EQU(m.data[i][j],0))
+				break;
+		r+=j!=m.col;
+	}
 	return r;
 }
 Mat Mat::LS(Mat& v){
@@ -473,7 +481,7 @@ Mat Mat::nullspace(){
 				m.data[i][j]=m.data[maxV][j];
 				m.data[maxV][j]=t;
 			}
-		if(m.data[i][i]==0)
+		if(EQU(m.data[i][i],0))
 			continue;
 		for(int j=i+1;j<m.row;j++)
 			for(int k=m.col-1;k>=i;k--)

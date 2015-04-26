@@ -213,21 +213,21 @@ void MainWindow::on_pushButton_clicked()
 		}
 		/////向量指令/////
 		else if(inst=="norm"){
-			if(args.size()<1) throw "請輸入向量";
+			if(args.size()<1) throw "請輸入向量~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			Vec v = calc(args[0]).getRowData(0);
 			ui->textBrowser->append(QString("%1").arg(v.norm()));
 		}
 		else if(inst=="normal"){
-			if(args.size()<1) throw "請輸入向量";
+			if(args.size()<1) throw "請輸入向量~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			Vec v = calc(args[0]).getRowData(0);
 			ui->textBrowser->append(QString::fromStdString(v.normal().toString()));
 		}
 		else if(inst=="cross"){
-			if(args.size()<2) throw "請輸入兩個向量";
+			if(args.size()<2) throw "請輸入兩個向量~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			args[1] = toPostfix(args[1]);
@@ -236,7 +236,7 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(QString::fromStdString(v1.cross3(v2).toString()));
 		}
 		else if(inst=="com"){
-			if(args.size()<2) throw "請輸入兩個向量";
+			if(args.size()<2) throw "請輸入兩個向量~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			args[1] = toPostfix(args[1]);
@@ -245,7 +245,7 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(QString("%1").arg(v1.comp(v2)));
 		}
 		else if(inst=="proj"){
-			if(args.size()<2) throw "請輸入兩個向量";
+			if(args.size()<2) throw "請輸入兩個向量~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			args[1] = toPostfix(args[1]);
@@ -254,7 +254,7 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(QString::fromStdString(v1.proj(v2).toString()));
 		}
 		else if(inst=="area"){
-			if(args.size()<2) throw "請輸入兩個向量";
+			if(args.size()<2) throw "請輸入兩個向量~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			args[1] = toPostfix(args[1]);
@@ -263,7 +263,7 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(QString("%1").arg(v1.Area(v2)));
 		}
 		else if(inst=="ispara"){
-			if(args.size()<2) throw "請輸入兩個向量";
+			if(args.size()<2) throw "請輸入兩個向量~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			args[1] = toPostfix(args[1]);
@@ -272,7 +272,7 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(v1.isParal(v2)?"Yes":"No");
 		}
 		else if(inst=="isorth"){
-			if(args.size()<2) throw "請輸入兩個向量";
+			if(args.size()<2) throw "請輸入兩個向量~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			args[1] = toPostfix(args[1]);
@@ -281,7 +281,7 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(v1.isOrtho(v2)?"Yes":"No");
 		}
 		else if(inst=="angle"){
-			if(args.size()<2) throw "請輸入兩個向量";
+			if(args.size()<2) throw "請輸入兩個向量~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			args[1] = toPostfix(args[1]);
@@ -290,7 +290,7 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(QString("%1").arg(v1.angle_degree(v2)));
 		}
 		else if(inst=="pn"){
-			if(args.size()<2) throw "請輸入兩個向量";
+			if(args.size()<2) throw "請輸入兩個向量~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			args[1] = toPostfix(args[1]);
@@ -299,33 +299,33 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(QString::fromStdString(v1.planeNormal(v2).toString()));
 		}
 		else if(inst=="isli"){
-			if(args.size()<1) throw "請輸入向量";
+			if(args.size()<1) throw "請輸入向量~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			Vec vi = calc(args[0]).getRowData(0);
 			Vec *va=new Vec[vi.getDim()];
 			va[0]=vi;
-			if(args.size()<vi.getDim()) throw "請輸入N個N維向量";
+			if(args.size()<vi.getDim()) throw "請輸入N個N維向量~";
 			for(int i=1;i<vi.getDim();i++){
 				args[i] = toPostfix(args[i]);
 				va[i]=calc(args[i]).getRowData(0);
-				if(va[i].getDim()!=vi.getDim()) throw "請輸入N個N維向量";
+				if(va[i].getDim()!=vi.getDim()) throw "請輸入N個N維向量~";
 			}
 			Mat mm(va,vi.getDim(),vi.getDim());
 			ui->textBrowser->append(mm.IsLI()?"Yes":"No");
 		}
 		else if(inst=="ob"){
-			if(args.size()<1) throw "請輸入向量";
+			if(args.size()<1) throw "請輸入向量~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			Vec vi = calc(args[0]).getRowData(0);
 			Vec *va=new Vec[vi.getDim()];
 			va[0]=vi;
-			if(args.size()<vi.getDim()) throw "請輸入N個N維向量";
+			if(args.size()<vi.getDim()) throw "請輸入N個N維向量~";
 			for(int i=1;i<vi.getDim();i++){
 				args[i] = toPostfix(args[i]);
 				va[i]=calc(args[i]).getRowData(0);
-				if(va[i].getDim()!=vi.getDim()) throw "請輸入N個N維向量";
+				if(va[i].getDim()!=vi.getDim()) throw "請輸入N個N維向量~";
 			}
 			Vec::ob(va);
 			for(int i=0;i<vi.getDim();i++){
@@ -334,21 +334,21 @@ void MainWindow::on_pushButton_clicked()
 		}
 		/////矩陣指令/////
 		else if(inst=="rank"){
-			if(args.size()<1) throw "請輸入矩陣";
+			if(args.size()<1) throw "請輸入矩陣~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			Mat mm = calc(args[0]);
 			ui->textBrowser->append(QString("%1").arg(mm.Rank()));
 		}
 		else if(inst=="trans"){
-			if(args.size()<1) throw "請輸入矩陣";
+			if(args.size()<1) throw "請輸入矩陣~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			Mat mm = calc(args[0]);
 			ui->textBrowser->append(QString::fromStdString(mm.trans().toString()));
 		}
 		else if(inst=="ssl"){
-			if(args.size()<2) throw "請輸入兩個矩陣";
+			if(args.size()<2) throw "請輸入兩個矩陣~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			args[1] = toPostfix(args[1]);
@@ -357,35 +357,35 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(QString::fromStdString(m1.SolveSquareLinearSys(m2).toString()));
 		}
 		else if(inst=="det"){
-			if(args.size()<1) throw "請輸入矩陣";
+			if(args.size()<1) throw "請輸入矩陣~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			Mat mm = calc(args[0]);
 			ui->textBrowser->append(QString("%1").arg(mm.det()));
 		}
 		else if(inst=="inv"){
-			if(args.size()<1) throw "請輸入矩陣";
+			if(args.size()<1) throw "請輸入矩陣~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			Mat mm = calc(args[0]);
 			ui->textBrowser->append(QString::fromStdString(mm.Inverse().toString()));
 		}
 		else if(inst=="adj"){
-			if(args.size()<1) throw "請輸入矩陣";
+			if(args.size()<1) throw "請輸入矩陣~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			Mat mm = calc(args[0]);
 			ui->textBrowser->append(QString::fromStdString(mm.Adj().toString()));
 		}
 		else if(inst=="null"){
-			if(args.size()<1) throw "請輸入矩陣";
+			if(args.size()<1) throw "請輸入矩陣~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			Mat mm = calc(args[0]);
 			ui->textBrowser->append(QString::fromStdString(mm.nullspace().toString()));
 		}
 		else if(inst=="eigen"){
-			if(args.size()<1) throw "請輸入矩陣";
+			if(args.size()<1) throw "請輸入矩陣~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			Mat mm = calc(args[0]);
@@ -396,7 +396,7 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(QString::fromStdString(ev.toString()));
 		}
 		else if(inst=="pm"){
-			if(args.size()<1) throw "請輸入矩陣";
+			if(args.size()<1) throw "請輸入矩陣~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			Mat mm = calc(args[0]);
@@ -405,7 +405,7 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(QString::fromStdString(ev.toString()));
 		}
 		else if(inst=="ls"){
-			if(args.size()<2) throw "請輸入兩個矩陣";
+			if(args.size()<2) throw "請輸入兩個矩陣~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			args[1] = toPostfix(args[1]);
@@ -414,7 +414,7 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(QString::fromStdString(m1.LS(m2).toString()));
 		}
 		else if(inst=="rref"){
-			if(args.size()<1) throw "請輸入矩陣";
+			if(args.size()<1) throw "請輸入矩陣~";
 			ui->textBrowser->append(inputStr);
 			args[0] = toPostfix(args[0]);
 			Mat mm = calc(args[0]);
