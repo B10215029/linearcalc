@@ -1,5 +1,4 @@
 ﻿#include "Mat.h"
-#include <iostream>
 
 void Mat::initData(int r,int c){
 	row=r;
@@ -451,7 +450,6 @@ int Mat::Rank(){
 				m.data[j][k]-=m.data[nr][k]*m.data[j][i]/m.data[nr][i];
 		nr++;
 	}
-	std::cout<<m.toString()<<std::endl;
 	int r=0;
 	for(int i=0;i<m.row;i++){
 		int j;

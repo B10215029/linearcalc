@@ -61,6 +61,7 @@ Mat MainWindow::calc(QString &inputStr){
 			int indexOffset=-65;
 			while(inputStr[++i]=='Z') //VZA=v[25]
 				indexOffset+=25;
+			if(inputStr[i].toLatin1()+indexOffset>=v.size()) throw "POwOq";
 			mxc.m=Mat(v[inputStr[i].toLatin1()+indexOffset]);
 			mxc.c='V';
 			stack.push(mxc);
@@ -70,6 +71,7 @@ Mat MainWindow::calc(QString &inputStr){
 			int indexOffset=-65;
 			while(inputStr[++i]=='Z')
 				indexOffset+=25;
+			if(inputStr[i].toLatin1()+indexOffset>=m.size()) throw "POwOq";
 			mxc.m=Mat(m[inputStr[i].toLatin1()+indexOffset]);
 			mxc.c='M';
 			stack.push(mxc);
@@ -82,7 +84,7 @@ Mat MainWindow::calc(QString &inputStr){
 				i++;
 				double pointNum=0;
 				while(inputStr[i+1].isDigit())
-					pointNum += (inputStr[++i].toLatin1()-48)/10.;
+					pointNum = (pointNum+inputStr[++i].toLatin1()-48)/10.;
 				num+=pointNum;
 			}
 			MatXChar mxc;
@@ -178,7 +180,7 @@ void MainWindow::on_pushButton_clicked()
 		/////通用指令/////
 		if(inst=="print"){
 			args[0]=toPostfix(args[0]);
-			ui->textBrowser->append(s);
+			ui->textBrowser->append(args[0]);
 			ui->textBrowser->append(QString::fromStdString(calc(args[0]).toString()));
 		}
 		else if(inst=="info"){//顯示矩陣的資訊(行數列數)
@@ -619,12 +621,19 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 
 void MainWindow::on_pushButton_10_clicked()//未定義
 {
-	try{
-		ui->textBrowser->append("=3=");
-	}
-	catch(const char* e){
-		ui->textBrowser->append(e);
-	}
+	v.clear();
+	m.clear();
+	ui->comboBox->clear();
+	ui->comboBox->addItem("select vec");
+	ui->comboBox_2->clear();
+	ui->comboBox_2->addItem("select mat");
+	ui->textBrowser->append("Clear data");
+//	try{
+//		ui->textBrowser->append("=3=");
+//	}
+//	catch(const char* e){
+//		ui->textBrowser->append(e);
+//	}
 }
 
 void MainWindow::on_actionSave_triggered()
