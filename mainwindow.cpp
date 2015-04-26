@@ -396,7 +396,13 @@ void MainWindow::on_pushButton_clicked()
 			ui->textBrowser->append(QString::fromStdString(ev.toString()));
 		}
 		else if(inst=="pm"){
-
+			if(args.size()<1) throw "請輸入矩陣";
+			ui->textBrowser->append(inputStr);
+			args[0] = toPostfix(args[0]);
+			Mat mm = calc(args[0]);
+			Vec ev;
+			ui->textBrowser->append(QString("%1").arg(mm.PowerMethod(ev)));
+			ui->textBrowser->append(QString::fromStdString(ev.toString()));
 		}
 		else if(inst=="ls"){
 			if(args.size()<2) throw "請輸入兩個矩陣";

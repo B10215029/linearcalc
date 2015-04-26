@@ -25,6 +25,6 @@ V  V	Det	行列式
 V  V	Inv	反矩陣	
 V  V	Adj	Adjoint Matrix	
 V  V	Eigen	特徵向量與特徵數	
-	PM	Power Method of Eigen value	?
+V  V	PM	Power Method of Eigen value	?
 V  V	LS	Method of Least Square	?
 V	RREF	LU上三角下三角	
