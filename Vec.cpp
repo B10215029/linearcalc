@@ -167,7 +167,6 @@ Vec Vec::proj(Vec& v){//----Projection
 double Vec::Area(Vec& v){
 	return (norm()*v.norm()*sin(angle_radian(v)))/2;
 }
-
 Vec Vec::cross3(const Vec& v){
 	if(dim!=3||v.dim!=3) throw "cross3失敗，維度不是3!";
 	Vec re(3);
@@ -195,24 +194,11 @@ void Vec::ob(Vec* v){
 	v[0].normalize();
 	for(int i=1;i<d;i++){
 		if(v[i].dim!=d) throw "ob失敗，維度不同!";
-		for(int j=0;j<i;j++){
+		for(int j=0;j<i;j++)
 			v[i]=v[i]-v[i].proj(v[j]);
-			v[i].normalize();
-		}
+		v[i].normalize();
 	}
 }
-//std::string Vec::toString(){
-//	std::ostringstream out;
-//	for(int i=0;i<dim;++i){
-//		if(i==0)
-//			out<<"(";
-//		if(i!=dim-1)
-//			out<<data[i]<<", ";
-//		else
-//			out<<data[i]<<")";
-//	}
-//	return out.str();
-//}
 std::string Vec::toString(){
 	std::ostringstream out;
 	for(int i=0;i<dim;++i){

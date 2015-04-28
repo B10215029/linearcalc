@@ -13,428 +13,400 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
-QString MainWindow::toPostfix(QString &inputStr){
-	QString outputStr;
-	QStack<QChar> operatorStack;
-	QMap<QString,int> operatorPriority;
-	operatorPriority["("] = 1;
-	operatorPriority[")"] = 1;
-	operatorPriority["+"] = 2;
-	operatorPriority["-"] = 2;
-	operatorPriority["*"] = 3;
-	operatorPriority["/"] = 3;
-
-	for(int i=0;i<inputStr.size();++i){
-		if(inputStr[i].isDigit() || inputStr[i]=='.') //number  //QRegExp("\\-*[1-9]+\\.*\\d*")
-			outputStr += inputStr[i];
-		else if(inputStr[i].isLetter()) //letter  //QRegExp("V[A-Z]|M[A-Z]")
-			outputStr += inputStr[i];
-		else if(inputStr[i] == '(')
-			operatorStack.push(inputStr[i]);
-		else if(inputStr[i] == ')'){
-			while(operatorStack.top()!='(')
-				outputStr += operatorStack.pop();
-			operatorStack.pop();
+Mat MainWindow::toPostfix(QString& inputStr){
+	QStack<Mat> tempResult;
+	QStringList opList;
+	for(int i=0;i<inputStr.size();i++){
+		if(inputStr[i].isDigit()){
+			double num=inputStr[i].toLatin1()-48,fraction=0;
+			while(inputStr[i+1].isDigit())
+				num=num*10+inputStr[++i].toLatin1()-48;
+			if(inputStr[i+1]=='.'){
+				i++;
+				int count=1;
+				while(inputStr[i+1].isDigit())
+					fraction+=(inputStr[++i].toLatin1()-48)/pow(10,count++);
+				num+=fraction;
+			}
+			tempResult.push(Mat::identity(1)*num);
 		}
-		else if(QString("+*-/").indexOf(inputStr[i])!=-1){
-			while(!operatorStack.isEmpty() && //有東西的話
-				  operatorPriority.value(QString(operatorStack.top())) >=
-				  operatorPriority.value(QString(inputStr[i]))) //裡面的東西比較大的話
-				outputStr += operatorStack.pop(); //就把他丟出來
-			operatorStack.push(inputStr[i]);  //最後再把自己丟進去
+		else if(inputStr[i]=='.'){
+			double fraction=0;
+			int count=1;
+			while(inputStr[i+1].isDigit())
+				fraction+=(inputStr[++i].toLatin1()-48)/pow(10,count++);
+			tempResult.push(Mat::identity(1)*fraction);
+		}
+		else if(inputStr[i]=='v'){
+			int indexNum,indexOffset=-97;
+			while(inputStr[++i]=='z') //vza=v[25]
+				indexOffset+=25;
+			if(!inputStr[i].isLetter()) throw "Input Error!";
+			indexNum=inputStr[i].toLatin1()+indexOffset;
+			if(indexNum>=v.size()) throw "V Out Of Range!";
+			tempResult.push(Mat(v[indexNum]));
+		}
+		else if(inputStr[i]=='m'){
+			int indexNum,indexOffset=-97;
+			while(inputStr[++i]=='z') //mza=m[25]
+				indexOffset+=25;
+			if(!inputStr[i].isLetter()) throw "Input Error!";
+			indexNum=inputStr[i].toLatin1()+indexOffset;
+			if(indexNum>=m.size()) throw "V Out Of Range!";
+			tempResult.push(m[indexNum]);
+		}
+		else if(inputStr[i]=='+'){
+			if(opList.isEmpty()) opList+="+";
+			else if(opList.last()=="(") opList+="+";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="+";
+			}
+		}
+		else if(inputStr[i]=='-'){
+			if(opList.isEmpty()) opList+="-";
+			else if(opList.last()=="(") opList+="-";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="-";
+			}
+		}
+		else if(inputStr[i]=='*'){
+			if(opList.isEmpty()) opList+="*";
+			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="(") opList+="*";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="*";
+			}
+		}
+		else if(inputStr[i]=='/'){
+			if(opList.isEmpty()) opList+="/";
+			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="(") opList+="/";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="/";
+			}
+		}
+		else if(inputStr[i]=='('){
+			opList+="(";
+		}
+		else if(inputStr[i]==')'){
+			while(1){
+				if(opList.isEmpty()) throw "Input Error! Couldn't Found '('";
+				else if(opList.last()=="("){
+					opList.removeLast();
+					break;
+				}
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+		}
+		else if(inputStr.mid(i,6)=="normal"){
+			if(opList.isEmpty()) opList+="normal";
+			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="normal";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="normal";
+			}
+			i+=5;
+		}
+		else if(inputStr.mid(i,4)=="norm"){
+			if(opList.isEmpty()) opList+="norm";
+			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="norm";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="norm";
+			}
+			i+=3;
+		}
+		else if(inputStr.mid(i,5)=="cross"){
+			if(opList.isEmpty()) opList+="cross";
+			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="cross";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="cross";
+			}
+			i+=4;
+		}
+		else if(inputStr.mid(i,3)=="com"){
+			if(opList.isEmpty()) opList+="com";
+			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="com";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="com";
+			}
+			i+=2;
+		}
+		else if(inputStr.mid(i,4)=="proj"){
+			if(opList.isEmpty()) opList+="proj";
+			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="proj";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="proj";
+			}
+			i+=3;
+		}
+		else if(inputStr.mid(i,4)=="area"){
+			if(opList.isEmpty()) opList+="area";
+			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="area";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="area";
+			}
+			i+=3;
+		}
+		else if(inputStr.mid(i,6)=="ispara"){
+			if(opList.isEmpty()) opList+="ispara";
+			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="ispara";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="ispara";
+			}
+			i+=5;
+		}
+		else if(inputStr.mid(i,6)=="isorth"){
+			if(opList.isEmpty()) opList+="isorth";
+			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="isorth";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="isorth";
+			}
+			i+=5;
+		}
+		else if(inputStr.mid(i,5)=="angle"){
+			if(opList.isEmpty()) opList+="angle";
+			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="angle";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="angle";
+			}
+			i+=4;
+		}
+		else if(inputStr.mid(i,2)=="pn"){
+			if(opList.isEmpty()) opList+="pn";
+			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="pn";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="pn";
+			}
+			i+=1;
+		}
+		else if(inputStr.mid(i,4)=="isli"){
+			if(opList.isEmpty()) opList+="isli";
+			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="isli";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="isli";
+			}
+			i+=3;
+		}
+		else if(inputStr.mid(i,2)=="ob"){
+			if(opList.isEmpty()) opList+="ob";
+			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="ob";
+			else{
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+				opList+="ob";
+			}
+			i+=1;
 		}
 	}
-
-	while(!operatorStack.empty())
-		outputStr += operatorStack.pop();
-	return outputStr;
+	while(!opList.isEmpty()){
+		QString inst=opList.last();
+		opList.removeLast();
+		calc(inst,tempResult);
+	}
+	if(tempResult.size()!=1) throw "Input Error!";
+	return tempResult.pop();
 }
 //只計算+*-/等operator
 //不管是向量還是矩陣都用矩陣回傳
-Mat MainWindow::calc(QString &inputStr){
-	QStack<MatXChar> stack;//Mat不管向量還是矩陣都能裝，MatXChar的c用來分辨是向量、矩陣還是常數
-	for(int i=0;i<inputStr.size();++i){
-		if(inputStr[i]=='V'){
-			//toLatin1可以把QChar轉成char
-			//Latin-1編碼前127字類似Ascii
-			MatXChar mxc;
-			int indexOffset=-65;
-			while(inputStr[++i]=='Z') //VZA=v[25]
-				indexOffset+=25;
-			mxc.m=Mat(v[inputStr[i].toLatin1()+indexOffset]);
-			mxc.c='V';
-			stack.push(mxc);
-		}
-		else if(inputStr[i]=='M'){
-			MatXChar mxc;
-			int indexOffset=-65;
-			while(inputStr[++i]=='Z')
-				indexOffset+=25;
-			mxc.m=Mat(m[inputStr[i].toLatin1()+indexOffset]);
-			mxc.c='M';
-			stack.push(mxc);
-		}
-		else if(inputStr[i].isDigit()){
-			double num = inputStr[i].toLatin1()-48;
-			while(inputStr[i+1].isDigit())  //整數部分
-				num = num*10+inputStr[++i].toLatin1()-48;
-			if(inputStr[i+1]=='.'){  //小數部分
-				i++;
-				double pointNum=0;
-				while(inputStr[i+1].isDigit())
-					pointNum += (inputStr[++i].toLatin1()-48)/10.;
-				num+=pointNum;
-			}
-			MatXChar mxc;
-			mxc.m=Mat::identity(1)*num;
-			mxc.c='C';
-			stack.push(mxc);
-		}
-
-		else if(inputStr[i]=='+'){
-			if(stack.size()<2) throw "powoq";//00
-			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
-			if(mxc1.c!=mxc2.c) throw "Input Error!";
-			result.m=mxc1.m+mxc2.m;
-			result.c=mxc1.c;
-			stack.push(result);
-		}
-		else if(inputStr[i]=='-'){	//負數?
-			if(stack.size()<2) throw "PowOq";//01
-			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
-			if(mxc1.c!=mxc2.c) throw "Input Error!";
-			result.m=mxc1.m-mxc2.m;
-			result.c=mxc1.c;
-			stack.push(result);
-		}
-
-		else if(inputStr[i]=='*'){
-			if(stack.size()<2) throw "POwoq";//10
-			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
-			int r1=mxc1.m.getRow(),r2=mxc2.m.getRow(),c1=mxc1.m.getCol(),c2=mxc2.m.getCol();
-			if((r1!=r2||c1!=c2) && mxc1.c!='M'){
-				if(r1==1&&c1==1){
-					result.m = mxc2.m * mxc1.m.getRowData(0).getData(0);
-					result.c = mxc2.c;
-				}
-				else if(r2==1&&c2==1){
-					result.m =  mxc2.m.getRowData(0).getData(0) * mxc1.m;
-					result.c = mxc1.c;
-				}
-				else if(r1==1){
-					result.m =  mxc2.m * mxc1.m.trans();
-					result.c = 'M';
-				}
-//				else if(r2==1){
-//					result.m =  mxc2.m * mxc1.m;
-//					result.c = 'M';
-//				}
-				else
-					throw "Input Error!";
-			}
-			else{
-				if(r1==1){
-					result.m = mxc2.m * mxc1.m.trans();
-					result.c = 'C';
-				}
-				else if(r1!=1||c1!=1){
-					result.m = mxc2.m * mxc1.m;
-					result.c = 'M';
-				}
-//				else if(r1==1&&c1==1){	//不能兩個常數運算
-//					result.m = mxc2.m * mxc1.m;
-//					result.c = 'C';
-//				}
-			}
-			stack.push(result);
-		}
-
-		else if(inputStr[i]=='/'){
-			if(stack.size()<2) throw "pOwOq";//11
-			MatXChar mxc1=stack.pop(),mxc2=stack.pop(),result;
-			if(mxc1.c=='C'){
-				result.m = mxc2.m / mxc1.m.getRowData(0).getData(0);
-				result.c = mxc2.c;
-			}
-			else throw "Input Error!";
-			stack.push(result);
-		}
+void MainWindow::calc(QString& inst,QStack<Mat>& numStack){
+	if(inst=="+"){
+		if(numStack.size()<2) throw "Input Error powoq!";
+		Mat m1=numStack.pop(),m2=numStack.pop(),result;
+		result=m2+m1;
+		numStack.push(result);
 	}
-	if(stack.size()<1) throw "poWoq";//100
-	return stack.pop().m;
+	else if(inst=="-"){
+		if(numStack.size()<2) throw "Input Error powOq!";
+		Mat m1=numStack.pop(),m2=numStack.pop(),result;
+		result=m2-m1;
+		numStack.push(result);
+	}
+	else if(inst=="*"){
+		if(numStack.size()<2) throw "Input Error pOwoq!";
+		Mat m1=numStack.pop(),m2=numStack.pop(),result;
+		if(m1.getRow()==1&&m1.getCol()==1)
+			result=m2*m1.getColData(0).getData(0);
+		else if(m1.getRow()==1&&m1.getCol()>1)
+			result=m2*m1.trans();
+		else
+			result=m2*m1;
+		numStack.push(result);
+	}
+	else if(inst=="/"){
+		if(numStack.size()<2) throw "Input Error pOwOq!";
+		Mat m1=numStack.pop(),m2=numStack.pop(),result;
+		if(m1.getRow()==1&&m1.getCol()==1)
+			result=m2/m1.getColData(0).getData(0);
+		else
+			throw "Input Error poWoq!";
+		numStack.push(result);
+	}
+	/////向量指令/////
+	else if(inst=="norm"){
+		if(numStack.size()<1) throw "請輸入向量~";
+		if(numStack.top().getRow()!=1) throw "Input Error poWOq!";
+		Vec v1=numStack.pop().getRowData(0);
+		numStack.push(Mat::identity(1)*v1.norm());
+	}
+	else if(inst=="normal"){
+		if(numStack.size()<1) throw "請輸入向量~";
+		if(numStack.top().getRow()!=1) throw "Input Error pOWoq!";
+		Vec v1=numStack.pop().getRowData(0);
+		v1=v1.normal();
+		numStack.push(Mat(v1));
+	}
+	else if(inst=="cross"){
+		if(numStack.size()<2) throw "請輸入兩個向量~";
+		Mat m1=numStack.pop(),m2=numStack.pop();
+		if(m1.getRow()!=1||m2.getRow()!=1) throw "Input Error pOWOq!";
+		Vec v1=m1.getRowData(0),v2=m2.getRowData(0);
+		v1=v2.cross3(v1);
+		numStack.push(Mat(v1));
+	}
+	else if(inst=="com"){
+		if(numStack.size()<2) throw "請輸入兩個向量~";
+		Mat m1=numStack.pop(),m2=numStack.pop();
+		if(m1.getRow()!=1||m2.getRow()!=1) throw "Input Error p0w0q!";
+		Vec v1=m1.getRowData(0),v2=m2.getRowData(0);
+		numStack.push(Mat::identity(1)*v2.comp(v1));
+	}
+	else if(inst=="proj"){
+		if(numStack.size()<2) throw "請輸入兩個向量~";
+		Mat m1=numStack.pop(),m2=numStack.pop();
+		if(m1.getRow()!=1||m2.getRow()!=1) throw "Input Error p0woq!";
+		Vec v1=m1.getRowData(0),v2=m2.getRowData(0);
+		v1=v2.proj(v1);
+		numStack.push(Mat(v1));
+	}
+	else if(inst=="area"){
+		if(numStack.size()<2) throw "請輸入兩個向量~";
+		Mat m1=numStack.pop(),m2=numStack.pop();
+		if(m1.getRow()!=1||m2.getRow()!=1) throw "Input Error pow0q!";
+		Vec v1=m1.getRowData(0),v2=m2.getRowData(0);
+		numStack.push(Mat::identity(1)*v2.Area(v1));
+	}
+	else if(inst=="ispara"){
+		if(numStack.size()<2) throw "請輸入兩個向量~";
+		Mat m1=numStack.pop(),m2=numStack.pop();
+		if(m1.getRow()!=1||m2.getRow()!=1) throw "Input Error p0wOq!";
+		Vec v1=m1.getRowData(0),v2=m2.getRowData(0);
+		numStack.push(Mat::identity(1)*v2.isParal(v1));
+		ui->textBrowser->append(numStack.last().getColData(0).getData(0)?"Yes":"No");
+	}
+	else if(inst=="isorth"){
+		if(numStack.size()<2) throw "請輸入兩個向量~";
+		Mat m1=numStack.pop(),m2=numStack.pop();
+		if(m1.getRow()!=1||m2.getRow()!=1) throw "Input Error pOw0q!";
+		Vec v1=m1.getRowData(0),v2=m2.getRowData(0);
+		numStack.push(Mat::identity(1)*v2.isOrtho(v1));
+		ui->textBrowser->append(numStack.last().getColData(0).getData(0)?"Yes":"No");
+	}
+	else if(inst=="angle"){
+		if(numStack.size()<2) throw "請輸入兩個向量~";
+		Mat m1=numStack.pop(),m2=numStack.pop();
+		if(m1.getRow()!=1||m2.getRow()!=1) throw "Input Error p0W0q!";
+		Vec v1=m1.getRowData(0),v2=m2.getRowData(0);
+		numStack.push(Mat::identity(1)*v2.angle_degree(v1));
+	}
+	else if(inst=="pn"){
+		if(numStack.size()<2) throw "請輸入兩個向量~";
+		Mat m1=numStack.pop(),m2=numStack.pop();
+		if(m1.getRow()!=1||m2.getRow()!=1) throw "Input Error p0Woq!";
+		Vec v1=m1.getRowData(0),v2=m2.getRowData(0);
+		v1=v2.planeNormal(v1);
+		numStack.push(Mat(v1));
+	}
+	else if(inst=="isli"){
+		if(numStack.size()<1) throw "請輸入向量~";
+		Mat m1=numStack.last();
+		if(m1.getRow()!=1) throw "Input Error poW0q!";
+		else if(numStack.size()<m1.getCol()) throw "請輸入N個N維向量~ pOW0q!";
+		Vec vs[m1.getCol()];
+		for(int i=0;i<m1.getCol();i++){
+			vs[i]=numStack.pop().getRowData(0);
+			if(vs[i].getDim()!=m1.getCol()) throw "請輸入N個N維向量~ p0WOq!";
+		}
+		m1=Mat(vs,m1.getCol(),m1.getCol());
+		numStack.push(Mat::identity(1)*m1.IsLI());
+		ui->textBrowser->append(numStack.last().getColData(0).getData(0)?"Yes":"No");
+	}
+	else if(inst=="ob"){
+		if(numStack.size()<1) throw "請輸入向量~";
+		Mat m1=numStack.last();
+		if(m1.getRow()!=1) throw "Input Error!";
+		else if(numStack.size()<m1.getCol()) throw "請輸入N個N維向量~";
+		Vec vs[m1.getCol()];
+		for(int i=0;i<m1.getCol();i++){
+			vs[i]=numStack.pop().getRowData(0);
+			if(vs[i].getDim()!=m1.getCol()) throw "請輸入N個N維向量~";
+		}
+		Vec::ob(vs);
+		numStack.push(Mat(vs,m1.getCol(),m1.getCol()));
+	}
+	/////矩陣指令/////
+
 }
 
 void MainWindow::on_pushButton_clicked()
 {
-	QString inputStr= ui->lineEdit->text(),s;
-	QStringList args= inputStr.split(' ');
-	QString inst = args[0].toLower();
-	for(int i=1;i<args.size();++i)
-		s+=args[i];
-	s=s.toUpper();
-	args = s.split(',');
-
 	try{
-		/////通用指令/////
-		if(inst=="print"){
-			args[0]=toPostfix(args[0]);
-			ui->textBrowser->append(s);
-			ui->textBrowser->append(QString::fromStdString(calc(args[0]).toString()));
-		}
-		else if(inst=="info"){//顯示矩陣的資訊(行數列數)
-			args[0] = toPostfix(args[0]);
-			Mat m = calc(args[0]);
-			ui->textBrowser->append(QString("%1 Row:%2 Col:%3 First data:%4").arg(args[0]).arg(m.getRow()).
-					arg(m.getCol()).arg(m.getRowData(0).getData(0)));
-		}
-		else if(inst=="new"){//手動新增變數(格式如輸入檔案)(沒有輸入錯誤的判斷)
-			args= inputStr.split(' ');//用空白隔開方便輸入
-			if(args[1].toUpper()=="V"){
-				Vec vv(args[2].toInt());
-				for(int i=0;i<vv.getDim();i++)
-					vv.setData(args[3+i].toDouble(),i);
-				v.push_back(vv);
-				ui->comboBox->addItem(QString("V%1").arg(QString("Z").repeated((v.size()-1)/25)+(97+((v.size()-1)%25))));
-				ui->textBrowser->append(QString("new %1").arg(ui->comboBox->itemText(ui->comboBox->count()-1)));
-			}
-			else if(args[1].toUpper()=="M"){
-				Mat mm(args[2].toInt(),args[3].toInt());
-				int k=0;
-				for(int r=0;r<mm.getRow();r++)
-					for(int c=0;c<mm.getCol();c++)
-						mm.setData(args[4+k++].toDouble(),r,c);
-				m.push_back(mm);
-				ui->comboBox_2->addItem(QString("M%1").arg(QString("Z").repeated((m.size()-1)/25)+(97+((m.size()-1)%25))));
-				ui->textBrowser->append(QString("new %1").arg(ui->comboBox_2->itemText(ui->comboBox_2->count()-1)));
-			}
-		}
-		else if(inst=="cls"){//清除輸出畫面
-			ui->textBrowser->setText("");
-		}
-		/////向量指令/////
-		else if(inst=="norm"){
-			if(args.size()<1) throw "請輸入向量~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			Vec v = calc(args[0]).getRowData(0);
-			ui->textBrowser->append(QString("%1").arg(v.norm()));
-		}
-		else if(inst=="normal"){
-			if(args.size()<1) throw "請輸入向量~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			Vec v = calc(args[0]).getRowData(0);
-			ui->textBrowser->append(QString::fromStdString(v.normal().toString()));
-		}
-		else if(inst=="cross"){
-			if(args.size()<2) throw "請輸入兩個向量~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			args[1] = toPostfix(args[1]);
-			Vec v1 = calc(args[0]).getRowData(0);
-			Vec v2 = calc(args[1]).getRowData(0);
-			ui->textBrowser->append(QString::fromStdString(v1.cross3(v2).toString()));
-		}
-		else if(inst=="com"){
-			if(args.size()<2) throw "請輸入兩個向量~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			args[1] = toPostfix(args[1]);
-			Vec v1 = calc(args[0]).getRowData(0);
-			Vec v2 = calc(args[1]).getRowData(0);
-			ui->textBrowser->append(QString("%1").arg(v1.comp(v2)));
-		}
-		else if(inst=="proj"){
-			if(args.size()<2) throw "請輸入兩個向量~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			args[1] = toPostfix(args[1]);
-			Vec v1 = calc(args[0]).getRowData(0);
-			Vec v2 = calc(args[1]).getRowData(0);
-			ui->textBrowser->append(QString::fromStdString(v1.proj(v2).toString()));
-		}
-		else if(inst=="area"){
-			if(args.size()<2) throw "請輸入兩個向量~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			args[1] = toPostfix(args[1]);
-			Vec v1 = calc(args[0]).getRowData(0);
-			Vec v2 = calc(args[1]).getRowData(0);
-			ui->textBrowser->append(QString("%1").arg(v1.Area(v2)));
-		}
-		else if(inst=="ispara"){
-			if(args.size()<2) throw "請輸入兩個向量~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			args[1] = toPostfix(args[1]);
-			Vec v1 = calc(args[0]).getRowData(0);
-			Vec v2 = calc(args[1]).getRowData(0);
-			ui->textBrowser->append(v1.isParal(v2)?"Yes":"No");
-		}
-		else if(inst=="isorth"){
-			if(args.size()<2) throw "請輸入兩個向量~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			args[1] = toPostfix(args[1]);
-			Vec v1 = calc(args[0]).getRowData(0);
-			Vec v2 = calc(args[1]).getRowData(0);
-			ui->textBrowser->append(v1.isOrtho(v2)?"Yes":"No");
-		}
-		else if(inst=="angle"){
-			if(args.size()<2) throw "請輸入兩個向量~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			args[1] = toPostfix(args[1]);
-			Vec v1 = calc(args[0]).getRowData(0);
-			Vec v2 = calc(args[1]).getRowData(0);
-			ui->textBrowser->append(QString("%1").arg(v1.angle_degree(v2)));
-		}
-		else if(inst=="pn"){
-			if(args.size()<2) throw "請輸入兩個向量~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			args[1] = toPostfix(args[1]);
-			Vec v1 = calc(args[0]).getRowData(0);
-			Vec v2 = calc(args[1]).getRowData(0);
-			ui->textBrowser->append(QString::fromStdString(v1.planeNormal(v2).toString()));
-		}
-		else if(inst=="isli"){
-			if(args.size()<1) throw "請輸入向量~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			Vec vi = calc(args[0]).getRowData(0);
-			Vec *va=new Vec[vi.getDim()];
-			va[0]=vi;
-			if(args.size()<vi.getDim()) throw "請輸入N個N維向量~";
-			for(int i=1;i<vi.getDim();i++){
-				args[i] = toPostfix(args[i]);
-				va[i]=calc(args[i]).getRowData(0);
-				if(va[i].getDim()!=vi.getDim()) throw "請輸入N個N維向量~";
-			}
-			Mat mm(va,vi.getDim(),vi.getDim());
-			ui->textBrowser->append(mm.IsLI()?"Yes":"No");
-		}
-		else if(inst=="ob"){
-			if(args.size()<1) throw "請輸入向量~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			Vec vi = calc(args[0]).getRowData(0);
-			Vec *va=new Vec[vi.getDim()];
-			va[0]=vi;
-			if(args.size()<vi.getDim()) throw "請輸入N個N維向量~";
-			for(int i=1;i<vi.getDim();i++){
-				args[i] = toPostfix(args[i]);
-				va[i]=calc(args[i]).getRowData(0);
-				if(va[i].getDim()!=vi.getDim()) throw "請輸入N個N維向量~";
-			}
-			Vec::ob(va);
-			for(int i=0;i<vi.getDim();i++){
-				ui->textBrowser->append(QString::fromStdString(va[i].toString()));
-			}
-		}
-		/////矩陣指令/////
-		else if(inst=="rank"){
-			if(args.size()<1) throw "請輸入矩陣~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			Mat mm = calc(args[0]);
-			ui->textBrowser->append(QString("%1").arg(mm.Rank()));
-		}
-		else if(inst=="trans"){
-			if(args.size()<1) throw "請輸入矩陣~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			Mat mm = calc(args[0]);
-			ui->textBrowser->append(QString::fromStdString(mm.trans().toString()));
-		}
-		else if(inst=="ssl"){
-			if(args.size()<2) throw "請輸入兩個矩陣~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			args[1] = toPostfix(args[1]);
-			Mat m1 = calc(args[0]);
-			Mat m2 = calc(args[1]);
-			ui->textBrowser->append(QString::fromStdString(m1.SolveSquareLinearSys(m2).toString()));
-		}
-		else if(inst=="det"){
-			if(args.size()<1) throw "請輸入矩陣~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			Mat mm = calc(args[0]);
-			ui->textBrowser->append(QString("%1").arg(mm.det()));
-		}
-		else if(inst=="inv"){
-			if(args.size()<1) throw "請輸入矩陣~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			Mat mm = calc(args[0]);
-			ui->textBrowser->append(QString::fromStdString(mm.Inverse().toString()));
-		}
-		else if(inst=="adj"){
-			if(args.size()<1) throw "請輸入矩陣~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			Mat mm = calc(args[0]);
-			ui->textBrowser->append(QString::fromStdString(mm.Adj().toString()));
-		}
-		else if(inst=="null"){
-			if(args.size()<1) throw "請輸入矩陣~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			Mat mm = calc(args[0]);
-			ui->textBrowser->append(QString::fromStdString(mm.nullspace().toString()));
-		}
-		else if(inst=="eigen"){
-			if(args.size()<1) throw "請輸入矩陣~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			Mat mm = calc(args[0]);
-			Vec ev;
-			Mat rm;
-			mm.eigen3(rm,ev);
-			ui->textBrowser->append(QString::fromStdString(rm.toString()));
-			ui->textBrowser->append(QString::fromStdString(ev.toString()));
-		}
-		else if(inst=="pm"){
-			if(args.size()<1) throw "請輸入矩陣~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			Mat mm = calc(args[0]);
-			Vec ev;
-			ui->textBrowser->append(QString("%1").arg(mm.PowerMethod(ev)));
-			ui->textBrowser->append(QString::fromStdString(ev.toString()));
-		}
-		else if(inst=="ls"){
-			if(args.size()<2) throw "請輸入兩個矩陣~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			args[1] = toPostfix(args[1]);
-			Mat m1 = calc(args[0]);
-			Mat m2 = calc(args[1]);
-			ui->textBrowser->append(QString::fromStdString(m1.LS(m2).toString()));
-		}
-		else if(inst=="rref"){
-			if(args.size()<1) throw "請輸入矩陣~";
-			ui->textBrowser->append(inputStr);
-			args[0] = toPostfix(args[0]);
-			Mat mm = calc(args[0]);
-			Mat l;
-			Mat u;
-			int a;
-			mm.LU(l,u,a);
-			ui->textBrowser->append(QString::fromStdString(l.toString()));
-			ui->textBrowser->append(QString::fromStdString(u.toString()));
-		}
-		/////其他/////
-		else
-			ui->textBrowser->append("No such instructions!");
+		QString inStr=ui->lineEdit->text();
+		ui->textBrowser->append(">>>"+inStr);
+		inStr=inStr.toLower();
+		Mat result=toPostfix(inStr);
+		ui->textBrowser->append(QString::fromStdString(result.toString()));
 	}
 	catch(const char* e){
 		ui->textBrowser->append(e);
 	}
-//	catch(...){
-//		ui->textBrowser->append("Pardon?");
-//	}
+	catch(const int e){
+		ui->textBrowser->append(QString::number(e));
+	}
 }
 
 void MainWindow::on_actionOpen_triggered()//Qt讀檔方式

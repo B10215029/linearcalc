@@ -8,13 +8,6 @@
 #include <QTextStream>
 #include <Vec.h>
 #include <Mat.h>
-//#include <iostream> //debug用
-
-class MatXChar{
-public:
-	char c;
-	Mat m;
-};
 
 namespace Ui {
 class MainWindow;
@@ -27,8 +20,8 @@ class MainWindow : public QMainWindow
 public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
-	QString toPostfix(QString &inputStr);
-	Mat calc(QString &inputStr);
+	Mat toPostfix(QString &inputStr);
+	void calc(QString &inst,QStack<Mat> &numStack);
 
 private slots:
 	void on_pushButton_clicked();
