@@ -98,18 +98,6 @@ Mat MainWindow::toPostfix(QString& inputStr){
 		else if(inputStr[i]=='('){
 			opList+="(";
 		}
-		else if(inputStr[i]==')'){
-			while(1){
-				if(opList.isEmpty()) throw "Input Error! Couldn't Found '('";
-				else if(opList.last()=="("){
-					opList.removeLast();
-					break;
-				}
-				QString inst=opList.last();
-				opList.removeLast();
-				calc(inst,tempResult);
-			}
-		}
 		else if(inputStr.mid(i,6)=="normal"){
 			if(opList.isEmpty()) opList+="normal";
 			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="normal";
@@ -591,12 +579,19 @@ void MainWindow::on_pushButton_9_clicked()//未定義
 
 void MainWindow::on_pushButton_10_clicked()//未定義
 {
-	try{
-		ui->textBrowser->append("=3=");
-	}
-	catch(const char* e){
-		ui->textBrowser->append(e);
-	}
+	v.clear();
+	m.clear();
+	ui->comboBox->clear();
+	ui->comboBox->addItem("select vec");
+	ui->comboBox_2->clear();
+	ui->comboBox_2->addItem("select mat");
+	ui->textBrowser->append("Clear data");
+//	try{
+//		ui->textBrowser->append("=3=");
+//	}
+//	catch(const char* e){
+//		ui->textBrowser->append(e);
+//	}
 }
 
 void MainWindow::on_actionSave_triggered()
