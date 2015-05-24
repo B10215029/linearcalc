@@ -229,14 +229,14 @@ double Mat::det(){
 //		x+=data[0][i]*pow(-1,0+i)*minor_mat(0,i).det();
 	return x;
 }
-Mat Mat::Adj(){
+Mat Mat::adj(){
 	Mat m(row,col);
 	for(int i=0;i<row;i++)
 		for(int j=0;j<col;j++)
 			m.setData(cofactor(i,j),j,i);
 	return m;
 }
-Mat Mat::GaussJordanRowReduction(){
+Mat Mat::gaussJordanRowReduction(){
 	Mat p=Mat::identity(row);
 	for(int i=0;i<row;i++) //find nearest row not 0 element
 		if(data[i][i]==0)
@@ -285,7 +285,7 @@ Mat Mat::GaussJordanRowReduction(){
 			if(EQU(data[i][j],0)) data[i][j]=0;
 	return p;
 }
-Mat Mat::Inverse(){
+Mat Mat::inverse(){
 	//type1 Adj()/det() 可能造成太多cost
 //	double x=det();
 //	if(x==0) throw "沒有反矩陣";
@@ -294,7 +294,7 @@ Mat Mat::Inverse(){
 	//type2 rrf
 	if(row!=col) throw "Inverse失敗，not square matrix!";
 	Mat a(*this),p,iden=Mat::identity(row);
-	p=a.GaussJordanRowReduction();
+	p=a.gaussJordanRowReduction();
 	if(a!=iden) throw "沒有Inverse!";
 	return p;
 }
@@ -323,16 +323,16 @@ void Mat::LU(Mat& l,Mat& u,int& swapCount){
 			for(int k=0;k<col;k++)
 				p.data[j][k]-=muti*p.data[i][k];
 		}
-	l=p.Inverse();
+	l=p.inverse();
 }
-bool Mat::IsLI(){
+bool Mat::isLI(){
 	if(row>col)
 		return false;
-	if(Rank()==row)
+	if(rank()==row)
 		return true;
 	return false;
 }
-Mat Mat::SolveSquareLinearSys(const Mat& b){
+Mat Mat::solveSquareLinearSys(const Mat& b){
 	if(row!=col || row!=b.row || b.col!=1) throw "SolveSquareLinearSys失敗，維度不同!";
 	Mat l,u,x(row,1),y(row,1);
 	y.data[0][0]=x.data[0][0]=1;
@@ -407,7 +407,7 @@ void Mat::eigen3(Mat& vecs,Vec& vals){
 			a_l=*this;
 			for(int j=0;j<row;j++)
 				a_l.data[j][j]-=vals.getData(i);
-			a_l.GaussJordanRowReduction();
+			a_l.gaussJordanRowReduction();
 			for(int j=row-1;j>=0;j--){
 				double sum=0;
 				if(a_l.data[j][j]==0){
@@ -420,8 +420,13 @@ void Mat::eigen3(Mat& vecs,Vec& vals){
 			}
 		}
 	}
+	Vec *tempV=new Vec[vecs.getCol()];
+	for(int i=0;i<vecs.getCol();i++)
+		tempV[i]=vecs.getColData(i).normal();
+	vecs.setData(tempV,vecs.getRow(),vecs.getCol());
+	vecs=vecs.trans();
 }
-int Mat::Rank(){
+int Mat::rank(){
 	Mat m(*this);
 	for(int i=0,nr=0;i<(m.row<m.col?m.row:m.col);i++){
 		int maxV=nr;
@@ -452,9 +457,9 @@ int Mat::Rank(){
 	return r;
 }
 Mat Mat::LS(Mat& v){
-	return (trans()*(*this)).Inverse()*trans()*v;
+	return (trans()*(*this)).inverse()*trans()*v;
 }
-double Mat::PowerMethod(Vec& xn){
+double Mat::powerMethod(Vec& xn){
 	if(row!=col) throw "PowerMethod失敗，not square matrix!";
 	double lambda;
 	Vec initVec(row);
@@ -531,7 +536,7 @@ std::string Mat::toString(){
 	std::ostringstream out;
 	for(int i=0;i<row;i++){
 		for(int j=0;j<col;j++)
-			out<<data[i][j]<<" ";
+			out<<data[i][j]<<"\t";
 		out<<"\n";
 	}
 	return out.str();

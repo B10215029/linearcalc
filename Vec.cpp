@@ -164,7 +164,7 @@ Vec Vec::proj(Vec& v){//----Projection
 	Vec re=comp(v)*v.normal();
 	return re;
 }
-double Vec::Area(Vec& v){
+double Vec::area(Vec& v){
 	return (norm()*v.norm()*sin(angle_radian(v)))/2;
 }
 Vec Vec::cross3(const Vec& v){
@@ -202,7 +202,7 @@ void Vec::ob(Vec* v){
 std::string Vec::toString(){
 	std::ostringstream out;
 	for(int i=0;i<dim;++i){
-		out<<data[i]<<" ";
+		out<<data[i]<<"\t";
 	}
 	out<<"\n";
 	return out.str();

@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include <QStack>
-#include <QMap>
 #include <QFileDialog>
 #include <QTextStream>
 #include <Vec.h>
@@ -43,16 +42,6 @@ private slots:
 	void on_pushButton_4_clicked();
 
 	void on_pushButton_5_clicked();
-
-	void on_pushButton_6_clicked();
-
-	void on_pushButton_7_clicked();
-
-	void on_pushButton_8_clicked();
-
-	void on_pushButton_9_clicked();
-
-	void on_pushButton_10_clicked();
 
 	void on_actionSave_triggered();
 

@@ -45,17 +45,17 @@ public:
 	Mat trans();
 	double cofactor(int r,int c);
 	double det();//type1 LU()
-	Mat Adj();
-	Mat GaussJordanRowReduction();
-	Mat Inverse();//type2 rrf
+	Mat adj();
+	Mat gaussJordanRowReduction();
+	Mat inverse();//type2 rrf
 	void LU(Mat& p,Mat& l,Mat& u);
 	void LU(Mat& l,Mat& u,int& swapCount);//type1 row reduction
-	bool IsLI();
-	Mat SolveSquareLinearSys(const Mat& b);
+	bool isLI();
+	Mat solveSquareLinearSys(const Mat& b);
 	void eigen3(Mat& vecs,Vec& vals);
-	int Rank();
+	int rank();
 	Mat LS(Mat& v);
-	double PowerMethod(Vec& xn);
+	double powerMethod(Vec& xn);
 	Mat nullspace();
 ////////// ////////// ////////// //////////
 	std::string toString();

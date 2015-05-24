@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>849</width>
-    <height>630</height>
+    <width>801</width>
+    <height>476</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,22 +16,33 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
-     <widget class="QTextBrowser" name="textBrowser">
-      <property name="lineWrapMode">
-       <enum>QTextEdit::NoWrap</enum>
-      </property>
-     </widget>
-    </item>
-    <item>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QLineEdit" name="lineEdit">
-        <property name="font">
-         <font>
-          <pointsize>20</pointsize>
-         </font>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QLineEdit" name="lineEdit">
+          <property name="font">
+           <font>
+            <pointsize>20</pointsize>
+           </font>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>RUN</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
@@ -63,7 +74,7 @@
           </property>
           <item>
            <property name="text">
-            <string>選擇常數</string>
+            <string>選擇指令</string>
            </property>
           </item>
           <item>
@@ -116,119 +127,254 @@
             <string>9</string>
            </property>
           </item>
+          <item>
+           <property name="text">
+            <string>.</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>+</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>-</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>*</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>/</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>(</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>normal</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>norm</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>cross</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>com</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>proj</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>area</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ispara</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>isorth</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>angle</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>pn</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>isli</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ob</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>rank</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>trans</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ssl</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>det</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>inv</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>adj</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>null</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>eigen_vals</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>eigen_vecs</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>eigen</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>pm_val</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>pm_vec</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>pm</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ls</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>lu_l</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>lu_u</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>lu</string>
+           </property>
+          </item>
          </widget>
         </item>
        </layout>
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="4" column="2">
-         <widget class="QPushButton" name="pushButton_8">
-          <property name="text">
-           <string>Clean input</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="3">
-         <widget class="QPushButton" name="pushButton_9">
-          <property name="text">
-           <string>PushButton</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QPushButton" name="pushButton_7">
-          <property name="text">
-           <string>Clean output</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QPushButton" name="pushButton_6">
-          <property name="text">
-           <string>Print</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="3">
-         <widget class="QPushButton" name="pushButton_5">
-          <property name="font">
-           <font>
-            <pointsize>18</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>/</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QPushButton" name="pushButton_2">
-          <property name="font">
-           <font>
-            <pointsize>18</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>+</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
+        <item row="0" column="4">
          <widget class="QPushButton" name="pushButton_4">
           <property name="font">
            <font>
-            <pointsize>18</pointsize>
+            <pointsize>8</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
-           <string>*</string>
+           <string>Cl Input</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
+        <item row="0" column="5">
+         <widget class="QPushButton" name="pushButton_5">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Cl Data</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
          <widget class="QPushButton" name="pushButton_3">
           <property name="font">
            <font>
-            <pointsize>18</pointsize>
+            <pointsize>8</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
-           <string>-</string>
+           <string>Cl Output</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="0">
-         <widget class="QPushButton" name="pushButton_10">
+        <item row="0" column="1">
+         <widget class="QPushButton" name="pushButton_2">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
           <property name="text">
-           <string>Clean data</string>
+           <string>Print</string>
           </property>
          </widget>
         </item>
        </layout>
       </item>
       <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton">
-        <property name="font">
-         <font>
-          <pointsize>24</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>RUN</string>
+       <widget class="QTextBrowser" name="textBrowser">
+        <property name="lineWrapMode">
+         <enum>QTextEdit::NoWrap</enum>
         </property>
        </widget>
       </item>
@@ -241,8 +387,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>849</width>
-     <height>25</height>
+     <width>801</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -255,7 +401,6 @@
    </widget>
    <addaction name="menuFile"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
   <action name="actionOpen">
    <property name="text">
     <string>Open</string>

@@ -14,7 +14,7 @@ protected:
 	double* data;
 	int dim;
 public:
-	Vec(void);
+	Vec();
 	Vec(int s);
 	Vec(double* d,int s);
 	Vec(const Vec& v);//----Asign
@@ -48,7 +48,7 @@ public:
 	double angle_degree(const Vec &v);
 	double comp(Vec& v);
 	Vec proj(Vec& v);
-	double Area(Vec& v);
+	double area(Vec& v);
 	Vec cross3(const Vec& v);
 	double cross3_norm(const Vec& v);
 	bool isParal(Vec &v);

@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -25,7 +25,7 @@ Mat MainWindow::toPostfix(QString& inputStr){
 				i++;
 				int count=1;
 				while(inputStr[i+1].isDigit())
-					fraction+=(inputStr[++i].toLatin1()-48)/pow(10,count++);
+					fraction+=(inputStr[++i].toLatin1()-48)/pow(10.0,count++);
 				num+=fraction;
 			}
 			tempResult.push(Mat::identity(1)*num);
@@ -34,7 +34,7 @@ Mat MainWindow::toPostfix(QString& inputStr){
 			double fraction=0;
 			int count=1;
 			while(inputStr[i+1].isDigit())
-				fraction+=(inputStr[++i].toLatin1()-48)/pow(10,count++);
+				fraction+=(inputStr[++i].toLatin1()-48)/pow(10.0,count++);
 			tempResult.push(Mat::identity(1)*fraction);
 		}
 		else if(inputStr[i]=='v'){
@@ -45,6 +45,22 @@ Mat MainWindow::toPostfix(QString& inputStr){
 			indexNum=inputStr[i].toLatin1()+indexOffset;
 			if(indexNum>=v.size()) throw "V Out Of Range!";
 			tempResult.push(Mat(v[indexNum]));
+			if(inputStr[i+1]=='~'){
+				if(inputStr[i+2]=='v'){
+					int lastIndexNum;
+					indexOffset=-97;
+					i+=2;
+					while(inputStr[++i]=='z') //vza=v[25]
+						indexOffset+=25;
+					if(!inputStr[i].isLetter()) throw "Input Error!";
+					lastIndexNum=inputStr[i].toLatin1()+indexOffset;
+					if(lastIndexNum>=v.size()) throw "V Out Of Range!";
+					for(int j=indexNum+1;j<=lastIndexNum;j++)
+						tempResult.push(Mat(v[j]));
+				}
+				else
+					throw "Input Error!";
+			}
 		}
 		else if(inputStr[i]=='m'){
 			int indexNum,indexOffset=-97;
@@ -52,182 +68,330 @@ Mat MainWindow::toPostfix(QString& inputStr){
 				indexOffset+=25;
 			if(!inputStr[i].isLetter()) throw "Input Error!";
 			indexNum=inputStr[i].toLatin1()+indexOffset;
-			if(indexNum>=m.size()) throw "V Out Of Range!";
+			if(indexNum>=m.size()) throw "M Out Of Range!";
 			tempResult.push(m[indexNum]);
+			if(inputStr[i+1]=='~'){
+				if(inputStr[i+2]=='m'){
+					int lastIndexNum;
+					indexOffset=-97;
+					i+=2;
+					while(inputStr[++i]=='z') //mza=m[25]
+						indexOffset+=25;
+					if(!inputStr[i].isLetter()) throw "Input Error!";
+					lastIndexNum=inputStr[i].toLatin1()+indexOffset;
+					if(lastIndexNum>=v.size()) throw "M Out Of Range!";
+					for(int j=indexNum+1;j<=lastIndexNum;j++)
+						tempResult.push(Mat(m[j]));
+				}
+				else
+					throw "Input Error!";
+			}
 		}
 		else if(inputStr[i]=='+'){
-			if(opList.isEmpty()) opList+="+";
-			else if(opList.last()=="(") opList+="+";
-			else{
+			if(!(opList.isEmpty()||opList.last()=="(")){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="+";
 			}
+			opList+="+";
 		}
 		else if(inputStr[i]=='-'){
-			if(opList.isEmpty()) opList+="-";
-			else if(opList.last()=="(") opList+="-";
-			else{
+			if(!(opList.isEmpty()||opList.last()=="(")){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="-";
 			}
+			opList+="-";
 		}
 		else if(inputStr[i]=='*'){
-			if(opList.isEmpty()) opList+="*";
-			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="(") opList+="*";
-			else{
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="(")){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="*";
 			}
+			opList+="*";
 		}
 		else if(inputStr[i]=='/'){
-			if(opList.isEmpty()) opList+="/";
-			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="(") opList+="/";
-			else{
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="(")){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="/";
 			}
+			opList+="/";
 		}
-		else if(inputStr[i]=='('){
+		else if(inputStr[i]=='(')
 			opList+="(";
-		}
-		else if(inputStr.mid(i,6)=="normal"){
-			if(opList.isEmpty()) opList+="normal";
-			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="normal";
-			else{
+		else if(inputStr[i]==')'){
+			if(opList.isEmpty()) throw "Input Error!";
+			while(opList.last()!="("){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="normal";
+				if(opList.isEmpty()) throw "Input Error! '(' Not Found";
 			}
+			opList.removeLast();
+		}
+		/////向量指令/////
+		else if(inputStr.mid(i,6)=="normal"){
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="normal";
 			i+=5;
 		}
 		else if(inputStr.mid(i,4)=="norm"){
-			if(opList.isEmpty()) opList+="norm";
-			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="norm";
-			else{
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="norm";
 			}
+			opList+="norm";
 			i+=3;
 		}
 		else if(inputStr.mid(i,5)=="cross"){
-			if(opList.isEmpty()) opList+="cross";
-			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="cross";
-			else{
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="cross";
 			}
+			opList+="cross";
 			i+=4;
 		}
 		else if(inputStr.mid(i,3)=="com"){
-			if(opList.isEmpty()) opList+="com";
-			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="com";
-			else{
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="com";
 			}
+			opList+="com";
 			i+=2;
 		}
 		else if(inputStr.mid(i,4)=="proj"){
-			if(opList.isEmpty()) opList+="proj";
-			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="proj";
-			else{
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="proj";
 			}
+			opList+="proj";
 			i+=3;
 		}
 		else if(inputStr.mid(i,4)=="area"){
-			if(opList.isEmpty()) opList+="area";
-			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="area";
-			else{
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="area";
 			}
+			opList+="area";
 			i+=3;
 		}
 		else if(inputStr.mid(i,6)=="ispara"){
-			if(opList.isEmpty()) opList+="ispara";
-			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="ispara";
-			else{
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="ispara";
 			}
+			opList+="ispara";
 			i+=5;
 		}
 		else if(inputStr.mid(i,6)=="isorth"){
-			if(opList.isEmpty()) opList+="isorth";
-			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="isorth";
-			else{
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="isorth";
 			}
+			opList+="isorth";
 			i+=5;
 		}
 		else if(inputStr.mid(i,5)=="angle"){
-			if(opList.isEmpty()) opList+="angle";
-			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="angle";
-			else{
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="angle";
 			}
+			opList+="angle";
 			i+=4;
 		}
 		else if(inputStr.mid(i,2)=="pn"){
-			if(opList.isEmpty()) opList+="pn";
-			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="pn";
-			else{
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="pn";
 			}
+			opList+="pn";
 			i+=1;
 		}
 		else if(inputStr.mid(i,4)=="isli"){
-			if(opList.isEmpty()) opList+="isli";
-			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="isli";
-			else{
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="isli";
 			}
+			opList+="isli";
 			i+=3;
 		}
 		else if(inputStr.mid(i,2)=="ob"){
-			if(opList.isEmpty()) opList+="ob";
-			else if(opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/") opList+="ob";
-			else{
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
 				QString inst=opList.last();
 				opList.removeLast();
 				calc(inst,tempResult);
-				opList+="ob";
 			}
+			opList+="ob";
+			i+=1;
+		}
+		/////矩陣指令/////
+		else if(inputStr.mid(i,4)=="rank"){
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="rank";
+			i+=3;
+		}
+		else if(inputStr.mid(i,5)=="trans"){
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="trans";
+			i+=4;
+		}
+		else if(inputStr.mid(i,3)=="ssl"){
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="ssl";
+			i+=2;
+		}
+		else if(inputStr.mid(i,3)=="det"){
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="det";
+			i+=2;
+		}
+		else if(inputStr.mid(i,3)=="inv"){
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="inv";
+			i+=2;
+		}
+		else if(inputStr.mid(i,3)=="adj"){
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="adj";
+			i+=2;
+		}
+		else if(inputStr.mid(i,4)=="null"){
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="null";
+			i+=3;
+		}
+		else if(inputStr.mid(i,10)=="eigen_vals"){//可與其他指令並用
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="eigen_vals";
+			i+=9;
+		}
+		else if(inputStr.mid(i,10)=="eigen_vecs"){//可與其他指令並用
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="eigen_vecs";
+			i+=9;
+		}
+		else if(inputStr.mid(i,5)=="eigen"){//不可與其他指令並用
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="eigen";
+			i+=4;
+		}
+		else if(inputStr.mid(i,6)=="pm_val"){//可與其他指令並用
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="pm_val";
+			i+=5;
+		}
+		else if(inputStr.mid(i,6)=="pm_vec"){//可與其他指令並用
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="pm_vec";
+			i+=5;
+		}
+		else if(inputStr.mid(i,2)=="pm"){//不可與其他指令並用
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="pm";
+			i+=1;
+		}
+		else if(inputStr.mid(i,2)=="ls"){
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="ls";
+			i+=1;
+		}
+		else if(inputStr.mid(i,4)=="lu_l"){//可與其他指令並用
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="lu_l";
+			i+=3;
+		}
+		else if(inputStr.mid(i,4)=="lu_u"){//可與其他指令並用
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="lu_u";
+			i+=3;
+		}
+		else if(inputStr.mid(i,2)=="lu"){//不可與其他指令並用
+			if(!(opList.isEmpty()||opList.last()=="+"||opList.last()=="-"||opList.last()=="*"||opList.last()=="/"||opList.last()=="(")){
+				QString inst=opList.last();
+				opList.removeLast();
+				calc(inst,tempResult);
+			}
+			opList+="lu";
 			i+=1;
 		}
 	}
@@ -239,9 +403,8 @@ Mat MainWindow::toPostfix(QString& inputStr){
 	if(tempResult.size()!=1) throw "Input Error!";
 	return tempResult.pop();
 }
-//只計算+*-/等operator
-//不管是向量還是矩陣都用矩陣回傳
-void MainWindow::calc(QString& inst,QStack<Mat>& numStack){
+
+void MainWindow::calc(QString& inst,QStack<Mat>& numStack){//不管是向量還是矩陣都用矩陣回傳(numStack)
 	if(inst=="+"){
 		if(numStack.size()<2) throw "Input Error powoq!";
 		Mat m1=numStack.pop(),m2=numStack.pop(),result;
@@ -316,7 +479,7 @@ void MainWindow::calc(QString& inst,QStack<Mat>& numStack){
 		Mat m1=numStack.pop(),m2=numStack.pop();
 		if(m1.getRow()!=1||m2.getRow()!=1) throw "Input Error pow0q!";
 		Vec v1=m1.getRowData(0),v2=m2.getRowData(0);
-		numStack.push(Mat::identity(1)*v2.Area(v1));
+		numStack.push(Mat::identity(1)*v2.area(v1));
 	}
 	else if(inst=="ispara"){
 		if(numStack.size()<2) throw "請輸入兩個向量~";
@@ -354,30 +517,135 @@ void MainWindow::calc(QString& inst,QStack<Mat>& numStack){
 		Mat m1=numStack.last();
 		if(m1.getRow()!=1) throw "Input Error poW0q!";
 		else if(numStack.size()<m1.getCol()) throw "請輸入N個N維向量~ pOW0q!";
-		Vec vs[m1.getCol()];
+		Vec *vs=new Vec[m1.getCol()];
 		for(int i=0;i<m1.getCol();i++){
 			vs[i]=numStack.pop().getRowData(0);
 			if(vs[i].getDim()!=m1.getCol()) throw "請輸入N個N維向量~ p0WOq!";
 		}
 		m1=Mat(vs,m1.getCol(),m1.getCol());
-		numStack.push(Mat::identity(1)*m1.IsLI());
+		numStack.push(Mat::identity(1)*m1.isLI());
 		ui->textBrowser->append(numStack.last().getColData(0).getData(0)?"Yes":"No");
+		delete[] vs;
 	}
 	else if(inst=="ob"){
 		if(numStack.size()<1) throw "請輸入向量~";
 		Mat m1=numStack.last();
 		if(m1.getRow()!=1) throw "Input Error!";
 		else if(numStack.size()<m1.getCol()) throw "請輸入N個N維向量~";
-		Vec vs[m1.getCol()];
-		for(int i=0;i<m1.getCol();i++){
+		Vec *vs=new Vec[m1.getCol()];
+		for(int i=m1.getCol()-1;i>=0;i--){
 			vs[i]=numStack.pop().getRowData(0);
 			if(vs[i].getDim()!=m1.getCol()) throw "請輸入N個N維向量~";
 		}
 		Vec::ob(vs);
 		numStack.push(Mat(vs,m1.getCol(),m1.getCol()));
+		delete[] vs;
 	}
 	/////矩陣指令/////
-
+	else if(inst=="rank"){
+		if(numStack.size()<1) throw "請輸入矩陣~";
+		numStack.push(numStack.pop().rank()*Mat::identity(1));
+	}
+	else if(inst=="trans"){
+		if(numStack.size()<1) throw "請輸入矩陣~";
+		numStack.push(numStack.pop().trans());
+	}
+	else if(inst=="ssl"){
+		if(numStack.size()<2) throw "請輸入兩個矩陣~";
+		Mat mb=numStack.pop(),ma=numStack.pop();
+		numStack.push(ma.solveSquareLinearSys(mb));
+	}
+	else if(inst=="det"){
+		if(numStack.size()<1) throw "請輸入矩陣~";
+		numStack.push(numStack.pop().det()*Mat::identity(1));
+	}
+	else if(inst=="inv"){
+		if(numStack.size()<1) throw "請輸入矩陣~";
+		numStack.push(numStack.pop().inverse());
+	}
+	else if(inst=="adj"){
+		if(numStack.size()<1) throw "請輸入矩陣~";
+		numStack.push(numStack.pop().adj());
+	}
+	else if(inst=="null"){
+		if(numStack.size()<1) throw "請輸入矩陣~";
+		numStack.push(numStack.pop().nullspace());
+	}
+	else if(inst=="eigen"){//不可與其他指令並用
+		if(numStack.size()<1) throw "請輸入矩陣~";
+		Mat m1=numStack.pop(),eVecs;
+		Vec eVals;
+		m1.eigen3(eVecs,eVals);
+		ui->textBrowser->append("Eigen Values:\n"+QString::fromStdString(eVals.toString()));
+		ui->textBrowser->append("Eigen Vectors:\n"+QString::fromStdString(eVecs.toString()));
+		throw "";
+	}
+	else if(inst=="eigen_vals"){//可與其他指令並用
+		if(numStack.size()<1) throw "請輸入矩陣~";
+		Mat m1=numStack.pop(),eVecs;
+		Vec eVals;
+		m1.eigen3(eVecs,eVals);
+		numStack.push(eVals);
+	}
+	else if(inst=="eigen_vecs"){//可與其他指令並用
+		if(numStack.size()<1) throw "請輸入矩陣~";
+		Mat m1=numStack.pop(),eVecs;
+		Vec eVals;
+		m1.eigen3(eVecs,eVals);
+		numStack.push(eVecs);
+	}
+	else if(inst=="pm"){//不可與其他指令並用
+		if(numStack.size()<1) throw "請輸入矩陣~";
+		Vec initVec;
+		ui->textBrowser->append("Dominant Eigen Value:\n"+QString::number(numStack.pop().powerMethod(initVec)));
+		ui->textBrowser->append("Dominant Eigen Vector:\n"+QString::fromStdString(initVec.toString()));
+		throw "";
+	}
+	else if(inst=="pm_val"){//可與其他指令並用
+		if(numStack.size()<1) throw "請輸入矩陣~";
+		Vec initVec;
+		numStack.push(numStack.pop().powerMethod(initVec)*Mat::identity(1));
+	}
+	else if(inst=="pm_vec"){//可與其他指令並用
+		if(numStack.size()<1) throw "請輸入矩陣~";
+		Vec initVec;
+		numStack.pop().powerMethod(initVec);
+		numStack.push(initVec);
+	}
+	else if(inst=="ls"){
+		if(numStack.size()<2) throw "請輸入兩個矩陣~";
+		Mat mb=numStack.pop(),ma=numStack.pop();
+		numStack.push(ma.LS(mb));
+	}
+	else if(inst=="lu"){//不可與其他指令並用
+		if(numStack.size()<1) throw "請輸入矩陣~";
+		Mat m1=numStack.pop();
+		Mat l,u;
+		int count;
+		m1.LU(l,u,count);
+		ui->textBrowser->append("L:\n"+QString::fromStdString(l.toString()));
+		ui->textBrowser->append("U:\n"+QString::fromStdString(u.toString()));
+		throw "";
+	}
+	else if(inst=="lu_l"){//可與其他指令並用
+		if(numStack.size()<1) throw "請輸入矩陣~";
+		Mat m1=numStack.pop();
+		Mat l,u;
+		int count;
+		m1.LU(l,u,count);
+		numStack.push(l);
+	}
+	else if(inst=="lu_u"){//可與其他指令並用
+		if(numStack.size()<1) throw "請輸入矩陣~";
+		Mat m1=numStack.pop();
+		Mat l,u;
+		int count;
+		m1.LU(l,u,count);
+		numStack.push(u);
+	}
+	/////其他/////
+	else
+		ui->textBrowser->append("Abuse "+inst+" Instructions!");
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -390,7 +658,7 @@ void MainWindow::on_pushButton_clicked()
 		ui->textBrowser->append(QString::fromStdString(result.toString()));
 	}
 	catch(const char* e){
-		ui->textBrowser->append(e);
+		ui->textBrowser->append(QString::fromLocal8Bit(e));
 	}
 	catch(const int e){
 		ui->textBrowser->append(QString::number(e));
@@ -484,114 +752,30 @@ void MainWindow::on_comboBox_3_activated(const QString &arg1)//選擇常數
 		ui->lineEdit->insert(arg1);
 }
 
-void MainWindow::on_pushButton_2_clicked()// '+'
-{
-	ui->lineEdit->insert("+");
-}
-
-void MainWindow::on_pushButton_3_clicked()// '-'
-{
-	ui->lineEdit->insert("-");
-}
-
-void MainWindow::on_pushButton_4_clicked()// '*'
-{
-	ui->lineEdit->insert("*");
-}
-
-void MainWindow::on_pushButton_5_clicked()// '/'
-{
-	ui->lineEdit->insert("/");
-}
-
-void MainWindow::on_pushButton_6_clicked()//print:用於只有+*-/的運算式或是直接輸出某個變數
+void MainWindow::on_pushButton_2_clicked()//print:用於只有+*-/的運算式或是直接輸出某個變數
 {
 	ui->lineEdit->setText("Print ");
 }
 
-void MainWindow::on_pushButton_7_clicked()//清除輸出
+void MainWindow::on_pushButton_3_clicked()//清除輸出
 {
 	ui->textBrowser->setText("");
 }
 
-void MainWindow::on_pushButton_8_clicked()//清除輸入
+void MainWindow::on_pushButton_4_clicked()//清除輸入
 {
 	ui->lineEdit->setText("");
 }
 
-void MainWindow::on_pushButton_9_clicked()//未定義
-{
-	//test
-	try{
-//		Mat l,u;
-//		int swapCount;
-//		m[2].LU(l,u,swapCount);
-//		ui->textBrowser->append(QString::fromStdString((l*u).toString())+"\n");
-//		ui->textBrowser->append(QString::fromStdString(l.toString())+"\n");
-//		ui->textBrowser->append(QString::fromStdString(u.toString())+"\n");
-
-//		ui->textBrowser->append(QString::number(m[2].det())+"\n");
-//		ui->textBrowser->append(QString::number(l.det())+"\n");
-//		ui->textBrowser->append(QString::number(u.det())+"\n");
-
-//		ui->textBrowser->append(QString::fromStdString(m[2].Inverse().toString())+"\n");
-
-//		ui->textBrowser->append(QString::fromStdString((l*u-m[0]).toString())+"\n");
-
-//		ui->textBrowser->append(QString::fromStdString((m[2]*m[2].Inverse()).toString())+"\n");
-//		ui->textBrowser->append(QString::fromStdString((m[2].Inverse()*m[2]).toString())+"\n");
-/////////////////////////////////////
-//		ui->textBrowser->append(QString::number(m[0].Rank())+"\n");
-//		ui->textBrowser->append(QString::number(m[1].Rank())+"\n");
-//		ui->textBrowser->append(QString::number(m[2].Rank())+"\n");
-/////////////////////////////////////
-//		ui->textBrowser->append(QString::number(v[0].dot(v[1]))+"\n");
-//		ui->textBrowser->append(QString::number(v[2].dot(v[3]))+"\n");
-//		ui->textBrowser->append(QString::number(v[4].dot(v[5]))+"\n");
-/////////////////////////////////////
-		//ui->textBrowser->append(QString::number(v[6].isOrtho(v[7]))+"\n");
-/////////////////////////////////////
-//		ui->textBrowser->append(QString::fromStdString(m[0].SolveSquareLinearSys(m[1]).toString())+"\n");
-//		ui->textBrowser->append(QString::fromStdString(m[2].SolveSquareLinearSys(m[3]).toString())+"\n");
-//		ui->textBrowser->append(QString::fromStdString(m[4].SolveSquareLinearSys(m[5]).toString())+"\n");
-/////////////////////////////////////
-//		Mat eiV;
-//		Vec vv;
-//		m[0].eigen3(eiV,vv);
-//		ui->textBrowser->append(QString::fromStdString(vv.toString())+"\n");
-//		ui->textBrowser->append(QString::fromStdString(eiV.toString())+"\n");
-//		m[1].eigen3(eiV,vv);
-//		ui->textBrowser->append(QString::fromStdString(vv.toString())+"\n");
-//		ui->textBrowser->append(QString::fromStdString(eiV.toString())+"\n");
-/////////////////////////////////////
-//		Vec x;
-//		ui->textBrowser->append(QString::number(m[0].PowerMethod(x))+"\n");
-//		ui->textBrowser->append(QString::fromStdString(x.toString())+"\n");
-//		ui->textBrowser->append(QString::number(m[1].PowerMethod(x))+"\n");
-//		ui->textBrowser->append(QString::fromStdString(x.toString())+"\n");
-//		ui->textBrowser->append(QString::number(m[2].PowerMethod(x))+"\n");
-//		ui->textBrowser->append(QString::fromStdString(x.toString())+"\n");
-	}
-	catch(const char* e){
-		ui->textBrowser->append(e);
-	}
-}
-
-void MainWindow::on_pushButton_10_clicked()//未定義
+void MainWindow::on_pushButton_5_clicked()//清除資料
 {
 	v.clear();
 	m.clear();
 	ui->comboBox->clear();
-	ui->comboBox->addItem("select vec");
+	ui->comboBox->addItem(QString::fromLocal8Bit("選擇向量"));
 	ui->comboBox_2->clear();
-	ui->comboBox_2->addItem("select mat");
-	ui->textBrowser->append("Clear data");
-//	try{
-//		ui->textBrowser->append("=3=");
-//	}
-//	catch(const char* e){
-//		ui->textBrowser->append(e);
-//	}
+	ui->comboBox_2->addItem(QString::fromLocal8Bit("選擇矩陣"));
+	ui->textBrowser->append("Clean data");
 }
 
 void MainWindow::on_actionSave_triggered()
